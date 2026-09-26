@@ -65,20 +65,38 @@ async function firebaseStore(cfg) {
 }
 
 // ——— Google Maps linki çözümleme ———
+// Kabul edilenler: uzun link, kısa link (maps.app.goo.gl), "Haritayı yerleştir" iframe kodu, düz mekân adı
 export function parseMapsLink(input) {
-  const s = (input || '').trim();
+  let s = (input || '').trim();
+  const ifr = s.match(/<iframe[^>]*src=["']([^"']+)["']/i); if (ifr) s = ifr[1].replace(/&amp;/g, '&');
   if (!/^https?:\/\//i.test(s)) return { kind: 'text', query: s };
-  if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(s)) return { kind: 'short' };
+  if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(s)) return { kind: 'short', link: s };
   let url; try { url = new URL(s); } catch (e) { return { kind: 'text', query: s }; }
-  const dec = t => decodeURIComponent(t.replace(/\+/g, ' '));
+  const dec = t => { try { return decodeURIComponent(t.replace(/\+/g, ' ')); } catch (e) { return t; } };
   let name = '', lat = null, lng = null;
-  const pm = url.pathname.match(/\/place\/([^/]+)/); if (pm) name = dec(pm[1]);
-  const q = url.searchParams.get('query') || url.searchParams.get('q') || url.searchParams.get('destination'); if (!name && q) name = q;
-  const d = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (d) { lat = +d[1]; lng = +d[2]; }
+  if (/\/maps\/embed/.test(url.pathname)) {
+    const pb = url.searchParams.get('pb') || '';
+    const nm = pb.match(/!1s0x[0-9a-f]+:0x[0-9a-f]+!2s([^!]+)/i); if (nm) name = dec(nm[1]);
+    const c = pb.match(/!2d(-?\d+\.\d+)!3d(-?\d+\.\d+)/); if (c) { lng = +c[1]; lat = +c[2]; }
+    const q = url.searchParams.get('q'); if (!name && q) name = q.replace(/^place_id:/, '');
+  } else {
+    const pm = url.pathname.match(/\/place\/([^/]+)/); if (pm) name = dec(pm[1]);
+    const q = url.searchParams.get('query') || url.searchParams.get('q') || url.searchParams.get('destination'); if (!name && q) name = q;
+    const c = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (c) { lat = +c[1]; lng = +c[2]; }
+  }
   const pid = url.searchParams.get('query_place_id') || url.searchParams.get('destination_place_id');
   if (!name && lat == null && !pid) return { kind: 'bad' };
-  return { kind: 'link', query: name || (lat + ',' + lng), lat, lng, placeId: pid || '', link: s };
+  const link = /\/maps\/embed/.test(url.pathname) ? '' : s;
+  return { kind: 'link', query: name || (lat + ',' + lng), lat, lng, placeId: pid || '', link };
+}
+
+// Kısa linki Vercel fonksiyonu (/api/resolve) üzerinden uzun linke çevirir
+export async function resolveShort(link) {
+  const r = await fetch('/api/resolve?u=' + encodeURIComponent(link));
+  if (!r.ok) throw new Error('çözülemedi');
+  const j = await r.json();
+  return parseMapsLink(j.url || '');
 }
 
 const FIELDS = 'id,displayName,formattedAddress,googleMapsUri,photos,addressComponents,rating,userRatingCount,location';

@@ -54,7 +54,16 @@ Site şu an **yerel mod**da çalışır (veriler tarayıcıda). Aşağıdaki 3 a
 Yeni mekân → Google Maps linkini ya da adını yapıştır → **Getir**: ad, şehir, ilçe, adres, fotoğraf ve Google puanı kendiliğinden dolar.
 Telefondan paylaşılan kısa linkler (`maps.app.goo.gl`) tarayıcıdan çözülemez; linki bir kez açıp adres çubuğundaki uzun linki yapıştır ya da adını yaz.
 
-## 3) GitHub + yayına alma (GitHub Pages)
+## 3a) Vercel ile yayına alma (önerilen — repo gizli kalabilir)
+
+1. https://vercel.com → **Continue with GitHub**.
+2. **Add New → Project** → `gurmeranya` reposunu **Import**.
+3. Framework Preset: **Other** · Build Command: boş · Output Directory: boş → **Deploy**.
+4. Adres: `https://gurmeranya.vercel.app` (Settings → Domains'ten kendi alan adını da bağlayabilirsin).
+5. GitHub'a her yüklemede Vercel kendiliğinden yeniler.
+6. Bu adresi Firebase **Authorized domains**'e ve Google anahtarının **Website restrictions**'ına ekle.
+
+## 3b) Alternatif: GitHub Pages (repo public olmalı)
 
 1. https://github.com/new → repo adı `gurmeranya` → Public → *Create*.
 2. *uploading an existing file* → bu projedeki tüm dosyaları (`_ds` klasörü hariç) sürükle → *Commit*.

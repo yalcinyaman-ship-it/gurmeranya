@@ -181,7 +181,7 @@ input[type=range]{accent-color:var(--color-accent)}
           <div style="padding:var(--space-4);background:var(--color-surface);display:flex;flex-direction:column;gap:var(--space-2);">
             <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">Google Maps linki ya da mekân adı</div>
             <div style="display:flex;gap:var(--space-2);">
-              <input class="input" value="{{ sq }}" onInput="{{ setSq }}" onKeyDown="{{ sqKey }}" placeholder="Linki yapıştır ya da yaz: Kebapçı İskender Bursa" style="background:var(--color-bg);">
+              <input class="input" value="{{ sq }}" onInput="{{ setSq }}" onKeyDown="{{ sqKey }}" placeholder="maps.app.goo.gl/… linki, yerleştirme kodu ya da mekân adı" style="background:var(--color-bg);">
               <button class="btn btn-primary" onClick="{{ doSearch }}" style="min-width:96px;justify-content:space-between;">{{ searchBtn }}</button>
             </div>
             <sc-if value="{{ searchNote }}"><div style="font-size:12px;color:var(--color-neutral-700);">{{ searchNote }}</div></sc-if>
@@ -350,15 +350,19 @@ class Component extends DCLogic {
   async doSearch() {
     const raw = this.state.sq.trim(); if (!raw) return;
     const key = this.key();
-    const p = this.db.parseMapsLink(raw);
-    if (p.kind === 'short') { this.setState({ searchNote: 'Kısa link (maps.app.goo.gl) tarayıcıdan çözülemiyor. Linki bir kez aç, adres çubuğundaki uzun linki yapıştır ya da mekânın adını yaz.' }); return; }
+    let p = this.db.parseMapsLink(raw);
+    if (p.kind === 'short') {
+      this.setState({ searching: true, searchNote: '' });
+      try { const full = await this.db.resolveShort(p.link); p = Object.assign(full, { link: p.link }); }
+      catch (e) { this.setState({ searching: false, searchNote: 'Kısa linki açamadım (Vercel dışında çalışmaz). Mekânın adını yazmayı dene.' }); return; }
+    }
     if (p.kind === 'bad') { this.setState({ searchNote: 'Bu linkten mekân çıkaramadım. Adını yazmayı dene.' }); return; }
     if (!key) { this.setState({ searchNote: 'Önce Ayarlar\'dan Places API anahtarını gir.' }); return; }
     this.setState({ searching: true, searchNote: '' });
     try {
-      if (p.kind === 'link' && p.placeId) { const r = await this.db.getPlace(key, p.placeId); this.fill(Object.assign(r, { mapUrl: p.link })); this.setState({ searching: false }); return; }
+      if (p.kind === 'link' && p.placeId) { const r = await this.db.getPlace(key, p.placeId); this.fill(Object.assign(r, p.link ? { mapUrl: p.link } : {})); this.setState({ searching: false }); return; }
       const res = await this.db.searchPlaces(key, p.query, p.kind === 'link' ? p : null);
-      if (p.kind === 'link' && res[0]) { this.fill(Object.assign(res[0], { mapUrl: p.link })); this.setState({ searching: false }); return; }
+      if (p.kind === 'link' && res[0]) { this.fill(Object.assign(res[0], p.link ? { mapUrl: p.link } : {})); this.setState({ searching: false }); return; }
       this.setState({ sres: res, searching: false, searchNote: res.length ? 'Hangisi?' : 'Bulunamadı. Başka türlü yaz.' });
     } catch (e) { this.setState({ searching: false, searchNote: 'Google hata verdi: ' + e.message }); }
   }
