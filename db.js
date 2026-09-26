@@ -1,4 +1,6 @@
 const LS = 'gurmeranya_v1';
+const PW_HASH = 'b12b5c8ecf3ea08367f79eab329e4b814d728e0910e21ca038e6825d3b1a69ff';
+const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(x => x.toString(16).padStart(2, '0')).join('');
 export const SEED_CATS = ['Kahvaltı', 'Döner', 'Kebap', 'Esnaf Lokantası', 'Tatlı', 'Balık', 'Pide & Lahmacun', 'Kahve', 'Sokak Lezzeti'];
 const SEED = [
   { id: 's1', name: 'Çiya Sofrası', city: 'İstanbul', district: 'Kadıköy', cat: 'Esnaf Lokantası', status: 'done', rating: 9, note: 'Menüyü ezberlemeye çalıştım, pes ettim. Her şeyden bir tabak.', createdAt: 7 },
@@ -33,7 +35,7 @@ function localStore(cfg) {
     async remove(id) { data.places = data.places.filter(x => x.id !== id); emit(); },
     async saveCats(list) { data.cats = list; emit(); },
     async saveSettings(st) { data.settings = Object.assign({}, data.settings, st); emit(); },
-    async login(pw) { if (pw !== 'yaman1905') return false; setAdmin(true); return true; },
+    async login(pw) { if (await sha(pw) !== PW_HASH) return false; setAdmin(true); return true; },
     async logout() { setAdmin(false); }
   };
 }
