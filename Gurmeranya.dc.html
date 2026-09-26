@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="./styles.css">
+<style>
+body{margin:0;background:var(--color-bg);color:var(--color-text)}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-700)}
+select.input{appearance:auto}
+input[type=range]{accent-color:var(--color-accent)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);font-family:var(--font-body);">
+  <header style="border-bottom:2px solid var(--color-divider);">
+    <div style="max-width:1320px;margin:0 auto;padding:var(--space-4) var(--space-6);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+      <div style="margin-right:auto;display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;letter-spacing:0.02em;">GURMERANYA<span style="color:var(--color-accent);">.</span></div>
+        <div style="font-size:13px;color:var(--color-neutral-700);">Bir midenin seyir defteri</div>
+      </div>
+      <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-secondary" onClick="{{ openSettings }}">Ayarlar</button>
+          <button class="btn btn-secondary" onClick="{{ openCats }}">Kategoriler</button>
+          <button class="btn btn-primary" onClick="{{ openAdd }}">Yeni mekân +</button>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+
+  <section style="max-width:1320px;margin:0 auto;padding:var(--space-8) var(--space-6) 0;">
+    <h1 style="margin:0;font-size:clamp(56px,10vw,144px);line-height:0.88;letter-spacing:-0.045em;text-wrap:balance;">Bugün ne<br>yesek<span style="color:var(--color-accent);">?</span></h1>
+    <div style="margin-top:var(--space-8);display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:2px solid var(--color-divider);">
+      <div style="padding:var(--space-4) var(--space-4) var(--space-6) 0;border-right:1px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ doneCount }}</div>
+        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Tabak sıyrıldı</div>
+      </div>
+      <div style="padding:var(--space-4) var(--space-4) var(--space-6);border-right:1px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ todoCount }}</div>
+        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Bekleme salonunda</div>
+      </div>
+      <div style="padding:var(--space-4) var(--space-4) var(--space-6);border-right:1px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ cityCount }}</div>
+        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Şehirde iz</div>
+      </div>
+      <div style="padding:var(--space-4) var(--space-4) var(--space-6);">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;color:var(--color-accent);">{{ avg }}</div>
+        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Ortalama puan / 10</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="position:sticky;top:0;z-index:5;background:var(--color-bg);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);">
+    <div style="max-width:1320px;margin:0 auto;padding:var(--space-3) var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);">
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;border:1px solid var(--color-divider);flex-wrap:wrap;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:var(--space-2);padding:9px 14px;border:none;cursor:pointer;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ t.bg }};color:{{ t.color }};">{{ t.label }}<span style="font-weight:400;font-size:12px;opacity:0.75;">{{ t.count }}</span></button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-left:auto;">
+          <select class="input" value="{{ city }}" onChange="{{ setCity }}" style="width:auto;min-width:150px;">
+            <option value="">Tüm şehirler</option>
+            <sc-for list="{{ cityOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+          </select>
+          <select class="input" value="{{ district }}" onChange="{{ setDistrict }}" style="width:auto;min-width:150px;">
+            <option value="">Tüm ilçeler</option>
+            <sc-for list="{{ districtOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+          </select>
+          <input class="input" value="{{ q }}" onInput="{{ setQ }}" placeholder="Mekân ara…" style="width:180px;">
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-2);overflow-x:auto;">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.onClick }}" style="flex:none;padding:6px 12px;cursor:pointer;font-family:var(--font-body);font-size:13px;white-space:nowrap;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <main style="max-width:1320px;margin:0 auto;padding:var(--space-6) var(--space-6) var(--space-8);display:flex;flex-wrap:wrap;gap:var(--space-8);align-items:flex-start;">
+    <div style="flex:1 1 440px;min-width:0;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:2px solid var(--color-divider);flex-wrap:wrap;">
+        <h2 style="margin:0;font-size:28px;">{{ tabTitle }}</h2>
+        <div style="font-size:13px;color:var(--color-neutral-700);">{{ tabSub }}</div>
+      </div>
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-8) 0;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:28px;">Tabak boş.</div>
+          <div style="margin-top:var(--space-2);color:var(--color-neutral-700);">Filtreleri gevşet ya da biraz daha acık.</div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+        <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:36px 88px minmax(0,1fr) auto;gap:var(--space-4);align-items:start;padding:var(--space-4) var(--space-2);border-bottom:1px solid var(--color-divider);cursor:pointer;background:{{ r.bg }};" style-hover="background:var(--color-surface);">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:14px;padding-top:2px;color:{{ r.numColor }};">{{ r.n }}</div>
+          <div style="aspect-ratio:1;background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-neutral-300) 6px 12px);position:relative;overflow:hidden;">
+            <sc-if value="{{ r.hasPhoto }}"><img class="grayscale" src="{{ r.photo }}" alt="{{ r.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></sc-if>
+          </div>
+          <div style="min-width:0;display:flex;flex-direction:column;gap:6px;">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;line-height:1.15;">{{ r.name }}</div>
+            <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap;font-size:12px;color:var(--color-neutral-700);">
+              <span>{{ r.loc }}</span><span class="tag tag-neutral">{{ r.cat }}</span><sc-if value="{{ r.hasG }}"><span style="font-size:12px;color:var(--color-text);">Google <strong>{{ r.g }}</strong></span></sc-if>
+            </div>
+            <sc-if value="{{ r.hasNote }}"><div style="font-size:14px;line-height:1.5;text-wrap:pretty;">{{ r.note }}</div></sc-if>
+            <sc-if value="{{ admin }}">
+              <div style="display:flex;gap:var(--space-1);margin-top:var(--space-1);">
+                <sc-if value="{{ r.isTodo }}"><button class="btn btn-ghost" onClick="{{ r.onWent }}" style="font-size:13px;">Gittim, puanla →</button></sc-if>
+                <button class="btn btn-ghost" onClick="{{ r.onEdit }}" style="font-size:13px;color:var(--color-text);">Düzenle</button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="text-align:right;min-width:64px;">
+            <sc-if value="{{ r.isDone }}">
+              <div style="font-family:var(--font-heading);font-weight:800;font-size:32px;line-height:1;color:var(--color-accent);">{{ r.rating }}</div>
+              <div style="font-size:11px;color:var(--color-neutral-700);margin-top:4px;">{{ r.ratingLabel }}</div>
+            </sc-if>
+            <sc-if value="{{ r.isTodo }}"><span class="tag tag-outline">Sırada</span></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <aside style="flex:1 1 380px;min-width:0;position:sticky;top:132px;border:2px solid var(--color-divider);background:var(--color-bg);">
+      <div style="aspect-ratio:4/3;background:var(--color-surface);position:relative;border-bottom:2px solid var(--color-divider);">
+        <sc-if value="{{ hasSel }}"><iframe src="{{ sel.embed }}" title="Harita" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="position:absolute;inset:0;width:100%;height:100%;border:0;filter:{{ mapFilter }};"></iframe></sc-if>
+      </div>
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);">
+          <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">{{ sel.statusLabel }} · {{ sel.cat }}</div>
+          <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;">
+            <h3 style="margin:0;font-size:32px;line-height:1.05;">{{ sel.name }}</h3>
+            <sc-if value="{{ sel.isDone }}"><div style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:0.9;color:var(--color-accent);white-space:nowrap;">{{ sel.rating }}<span style="font-size:16px;color:var(--color-neutral-600);">/10</span></div></sc-if>
+          </div>
+          <div style="font-size:14px;color:var(--color-neutral-700);">{{ sel.address }}</div>
+          <sc-if value="{{ sel.hasG }}"><div style="display:flex;gap:var(--space-2);align-items:baseline;font-size:14px;"><span style="font-family:var(--font-heading);font-weight:800;font-size:20px;">{{ sel.g }}</span><span style="color:var(--color-neutral-700);">Google puanı · {{ sel.gCount }} yorum</span></div></sc-if>
+          <sc-if value="{{ sel.hasNote }}">
+            <div style="padding:var(--space-4) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-size:16px;line-height:1.55;text-wrap:pretty;">{{ sel.note }}</div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-top:var(--space-2);">
+            <a class="btn btn-primary" href="{{ sel.dirUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:12px 14px;">Yol tarifi al <span>→</span></a>
+            <a class="btn btn-secondary" href="{{ sel.mapUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:12px 14px;">Google Maps <span>↗</span></a>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+  </main>
+
+  <footer style="border-top:2px solid var(--color-divider);">
+    <div style="max-width:1320px;margin:0 auto;padding:var(--space-6);display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+      <div style="font-size:12px;color:var(--color-neutral-700);">© Gurmeranya · Afiyet olsun. <span style="opacity:0.7;">{{ modeLabel }}</span></div>
+      <div style="display:flex;align-items:center;gap:var(--space-3);position:relative;">
+        <sc-if value="{{ admin }}"><button class="btn btn-ghost" onClick="{{ logout }}" style="font-size:12px;">Mutfaktan çık</button></sc-if>
+        <sc-if value="{{ lockOpen }}">
+          <div style="position:absolute;bottom:44px;right:0;width:260px;padding:var(--space-4);background:var(--color-surface);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:var(--space-2);">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;">Mutfağa giriş</div>
+            <input class="input" type="password" value="{{ pw }}" onInput="{{ setPw }}" onKeyDown="{{ pwKey }}" placeholder="Şifre">
+            <sc-if value="{{ pwErr }}"><div style="font-size:12px;color:var(--color-accent-700);">Yanlış. Şef seni tanımadı.</div></sc-if>
+            <button class="btn btn-primary btn-block" onClick="{{ tryLogin }}">Gir →</button>
+          </div>
+        </sc-if>
+        <button class="btn btn-icon" onClick="{{ toggleLock }}" title="Mutfak" style="width:28px;height:28px;color:var(--color-neutral-500);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ placeModal }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;overflow-y:auto;align-items:start;">
+      <div onClick="{{ stop }}" style="width:min(640px,100%);margin:var(--space-8) auto;background:var(--color-bg);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;">
+        <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">{{ formTitle }}</div>
+          <button class="btn btn-icon" onClick="{{ closeModal }}" style="font-size:20px;">×</button>
+        </div>
+        <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+          <div style="padding:var(--space-4);background:var(--color-surface);display:flex;flex-direction:column;gap:var(--space-2);">
+            <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">Google Maps linki ya da mekân adı</div>
+            <div style="display:flex;gap:var(--space-2);">
+              <input class="input" value="{{ sq }}" onInput="{{ setSq }}" onKeyDown="{{ sqKey }}" placeholder="Linki yapıştır ya da yaz: Kebapçı İskender Bursa" style="background:var(--color-bg);">
+              <button class="btn btn-primary" onClick="{{ doSearch }}" style="min-width:96px;justify-content:space-between;">{{ searchBtn }}</button>
+            </div>
+            <sc-if value="{{ searchNote }}"><div style="font-size:12px;color:var(--color-neutral-700);">{{ searchNote }}</div></sc-if>
+            <sc-for list="{{ sres }}" as="s">
+              <button onClick="{{ s.onPick }}" style="text-align:left;padding:var(--space-2) var(--space-3);border:none;border-top:1px solid var(--color-divider);background:transparent;cursor:pointer;font-family:var(--font-body);color:var(--color-text);" style-hover="background:var(--color-bg);">
+                <div style="font-weight:800;font-size:14px;">{{ s.name }}</div>
+                <div style="font-size:12px;color:var(--color-neutral-700);">{{ s.address }}{{ s.gText }}</div>
+              </button>
+            </sc-for>
+            <sc-if value="{{ formHasG }}">
+              <div style="display:flex;gap:var(--space-3);align-items:center;padding-top:var(--space-2);border-top:1px solid var(--color-divider);">
+                <sc-if value="{{ formHasPhoto }}"><img class="grayscale" src="{{ form.photoUrl }}" alt="" style="width:56px;height:56px;object-fit:cover;"></sc-if>
+                <div style="font-size:13px;flex:1;min-width:0;"><strong>Google'dan çekildi.</strong> Puan {{ form.googleRating }} · {{ formGCount }} yorum</div>
+                <sc-if value="{{ form.placeId }}"><button class="btn btn-ghost" onClick="{{ refreshG }}" style="font-size:12px;">Yenile</button></sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <div class="field"><label>Mekân adı</label><input class="input" value="{{ form.name }}" onInput="{{ f.name }}"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-3);">
+            <div class="field"><label>Şehir</label><input class="input" value="{{ form.city }}" onInput="{{ f.city }}"></div>
+            <div class="field"><label>İlçe</label><input class="input" value="{{ form.district }}" onInput="{{ f.district }}"></div>
+            <div class="field"><label>Kategori</label>
+              <select class="input" value="{{ form.cat }}" onChange="{{ f.cat }}">
+                <sc-for list="{{ cats }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Durum</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--color-divider);">
+              <button onClick="{{ setTodo }}" style="padding:10px 12px;border:none;cursor:pointer;text-align:left;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ todoBg }};color:{{ todoColor }};">Bekleme Salonu<div style="font-family:var(--font-body);font-weight:400;font-size:12px;opacity:0.8;">Gidilecek</div></button>
+              <button onClick="{{ setDone }}" style="padding:10px 12px;border:none;border-left:1px solid var(--color-divider);cursor:pointer;text-align:left;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ doneBg }};color:{{ doneColor }};">Tabak Sıyırdıklarım<div style="font-family:var(--font-body);font-weight:400;font-size:12px;opacity:0.8;">Gidildi</div></button>
+            </div>
+          </div>
+          <sc-if value="{{ formDone }}">
+            <div class="field"><label>Puan</label>
+              <div style="display:flex;align-items:center;gap:var(--space-4);">
+                <input type="range" min="1" max="10" step="1" value="{{ form.rating }}" onInput="{{ f.rating }}" style="flex:1;">
+                <div style="font-family:var(--font-heading);font-weight:800;font-size:36px;color:var(--color-accent);min-width:48px;text-align:right;">{{ form.rating }}</div>
+              </div>
+              <div style="font-size:13px;color:var(--color-neutral-700);">{{ formRatingLabel }}</div>
+            </div>
+          </sc-if>
+          <div class="field"><label>{{ noteLabel }}</label><textarea class="input" value="{{ form.note }}" onInput="{{ f.note }}"></textarea></div>
+          <div class="field"><label>Google Maps linki (opsiyonel)</label><input class="input" value="{{ form.mapUrl }}" onInput="{{ f.mapUrl }}" placeholder="https://maps.app.goo.gl/…"></div>
+        </div>
+        <div style="padding:var(--space-4) var(--space-6);border-top:2px solid var(--color-divider);display:flex;gap:var(--space-2);align-items:center;">
+          <sc-if value="{{ form.id }}"><button class="btn btn-ghost" onClick="{{ delPlace }}">Sil</button></sc-if>
+          <div style="margin-left:auto;display:flex;gap:var(--space-2);">
+            <button class="btn btn-secondary" onClick="{{ closeModal }}">Vazgeç</button>
+            <button class="btn btn-primary" onClick="{{ savePlace }}" style="min-width:140px;justify-content:space-between;">Kaydet <span>→</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ setModal }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;overflow-y:auto;">
+      <div onClick="{{ stop }}" style="width:min(560px,100%);background:var(--color-bg);box-shadow:var(--shadow-lg);">
+        <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">Ayarlar</div>
+          <button class="btn btn-icon" onClick="{{ closeModal }}" style="font-size:20px;">×</button>
+        </div>
+        <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+          <div class="field"><label>Google Places API anahtarı</label>
+            <div style="display:flex;gap:var(--space-2);">
+              <input class="input" type="{{ keyType }}" value="{{ keyDraft }}" onInput="{{ setKeyDraft }}" placeholder="AIza…" style="font-family:monospace;">
+              <button class="btn btn-secondary" onClick="{{ toggleKeyShow }}">{{ keyShowLabel }}</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-primary" onClick="{{ saveKey }}" style="min-width:140px;justify-content:space-between;">Kaydet <span>→</span></button>
+            <button class="btn btn-secondary" onClick="{{ testKey }}">{{ testLabel }}</button>
+            <span style="font-size:13px;color:{{ testColor }};">{{ testMsg }}</span>
+          </div>
+          <div style="border-top:2px solid var(--color-divider);padding-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);font-size:13px;line-height:1.55;">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:15px;">Anahtarın çalışması için</div>
+            <div>01 — Google Cloud Console → APIs &amp; Services → Library → <strong>Places API (New)</strong> etkin olsun.</div>
+            <div>02 — Credentials → anahtar → Website restrictions: <strong>{{ siteOrigin }}/*</strong> ekle.</div>
+            <div>03 — API restrictions: sadece Places API (New).</div>
+            <div style="color:var(--color-neutral-700);">Anahtar {{ keyWhere }}. Ziyaretçiler fotoğrafları görebilsin diye tarayıcıya gider; güvenliği 02. ve 03. adımdaki kısıtlamalar sağlar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ catModal }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;">
+      <div onClick="{{ stop }}" style="width:min(460px,100%);background:var(--color-bg);box-shadow:var(--shadow-lg);">
+        <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">Kategoriler</div>
+          <button class="btn btn-icon" onClick="{{ closeModal }}" style="font-size:20px;">×</button>
+        </div>
+        <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+          <div style="display:flex;gap:var(--space-2);">
+            <input class="input" value="{{ newCat }}" onInput="{{ setNewCat }}" onKeyDown="{{ catKey }}" placeholder="örn. Mantı">
+            <button class="btn btn-primary" onClick="{{ addCat }}">Ekle</button>
+          </div>
+          <div>
+            <sc-for list="{{ catRows }}" as="c">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);">
+                <span style="font-size:15px;">{{ c.name }} <span style="font-size:12px;color:var(--color-neutral-600);">{{ c.count }}</span></span>
+                <button class="btn btn-ghost" onClick="{{ c.onDel }}" style="font-size:12px;">Kaldır</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
+class Component extends DCLogic {
+  state = { places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sel: null, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
+
+  async componentDidMount() {
+    try {
+      const base = location.href;
+      const [{ CONFIG }, db] = await Promise.all([import(new URL('./config.js', base).href), import(new URL('./db.js', base).href)]);
+      this.cfg = CONFIG; this.db = db;
+      this.store = await db.createStore(CONFIG);
+      this.setState({ mode: this.store.mode });
+      this.store.subscribe(({ places, cats, settings }) => this.setState(s => ({ places, cats, settings: settings || {}, sel: s.sel && places.some(p => p.id === s.sel) ? s.sel : null })));
+      this.store.onAuth(a => this.setState({ admin: a }));
+    } catch (e) { console.error('Gurmeranya init', e); }
+  }
+
+  label(r) {
+    r = +r;
+    if (r >= 10) return 'Tabağı yaladım';
+    if (r >= 9) return 'Rüyama girdi';
+    if (r >= 8) return 'Yine gelirim';
+    if (r >= 7) return 'Güzeldi, abartmayalım';
+    if (r >= 5) return 'Açken yenir';
+    if (r >= 3) return 'Bir kere yeter';
+    return 'Midem küstü';
+  }
+
+  urls(p) {
+    const q = encodeURIComponent([p.name, p.address || '', p.district, p.city].filter(Boolean).join(' '));
+    const pid = p.placeId ? '&destination_place_id=' + p.placeId : '';
+    const qpid = p.placeId ? '&query_place_id=' + p.placeId : '';
+    return {
+      embed: 'https://maps.google.com/maps?q=' + (p.lat != null ? p.lat + ',' + p.lng : q) + '&z=16&output=embed',
+      dirUrl: 'https://www.google.com/maps/dir/?api=1&destination=' + q + pid,
+      mapUrl: p.mapUrl || ('https://www.google.com/maps/search/?api=1&query=' + q + qpid)
+    };
+  }
+
+  openForm(p) {
+    const base = { name: '', city: this.state.city || '', district: this.state.district || '', cat: this.state.cats[0] || '', status: 'todo', rating: 8, note: '', mapUrl: '' };
+    this.setState({ modal: 'place', form: Object.assign(base, p || {}), sq: '', sres: [], searchNote: '' });
+  }
+
+  key() { return (this.state.settings && this.state.settings.mapsKey) || (this.cfg && this.cfg.mapsKey) || ''; }
+
+  fill(r) {
+    this.setState(st => ({ sres: [], sq: '', searchNote: '', form: Object.assign({}, st.form, {
+      name: r.name || st.form.name, city: r.city || st.form.city, district: r.district || st.form.district,
+      address: r.address, placeId: r.placeId, mapUrl: r.mapUrl, photoUrl: r.photoUrl,
+      googleRating: r.googleRating, googleCount: r.googleCount, lat: r.lat, lng: r.lng }) }));
+  }
+
+  async doSearch() {
+    const raw = this.state.sq.trim(); if (!raw) return;
+    const key = this.key();
+    const p = this.db.parseMapsLink(raw);
+    if (p.kind === 'short') { this.setState({ searchNote: 'Kısa link (maps.app.goo.gl) tarayıcıdan çözülemiyor. Linki bir kez aç, adres çubuğundaki uzun linki yapıştır ya da mekânın adını yaz.' }); return; }
+    if (p.kind === 'bad') { this.setState({ searchNote: 'Bu linkten mekân çıkaramadım. Adını yazmayı dene.' }); return; }
+    if (!key) { this.setState({ searchNote: 'Önce Ayarlar\'dan Places API anahtarını gir.' }); return; }
+    this.setState({ searching: true, searchNote: '' });
+    try {
+      if (p.kind === 'link' && p.placeId) { const r = await this.db.getPlace(key, p.placeId); this.fill(Object.assign(r, { mapUrl: p.link })); this.setState({ searching: false }); return; }
+      const res = await this.db.searchPlaces(key, p.query, p.kind === 'link' ? p : null);
+      if (p.kind === 'link' && res[0]) { this.fill(Object.assign(res[0], { mapUrl: p.link })); this.setState({ searching: false }); return; }
+      this.setState({ sres: res, searching: false, searchNote: res.length ? 'Hangisi?' : 'Bulunamadı. Başka türlü yaz.' });
+    } catch (e) { this.setState({ searching: false, searchNote: 'Google hata verdi: ' + e.message }); }
+  }
+
+  async testKey() {
+    const k = this.state.keyDraft.trim(); if (!k) return;
+    this.setState({ testing: true, testMsg: '' });
+    try { const r = await this.db.searchPlaces(k, 'Karaköy Güllüoğlu'); this.setState({ testing: false, testOk: true, testMsg: r.length ? 'Çalışıyor. Google cevap verdi.' : 'Bağlandı ama sonuç yok.' }); }
+    catch (e) { this.setState({ testing: false, testOk: false, testMsg: 'Olmadı: ' + e.message }); }
+  }
+
+  renderVals() {
+    const s = this.state, P = this.props;
+    const accent = 'var(--color-accent)', bg = 'var(--color-bg)', ink = 'var(--color-text)';
+    const done = s.places.filter(p => p.status === 'done'), todo = s.places.filter(p => p.status !== 'done');
+    const avg = done.length ? (done.reduce((a, p) => a + (+p.rating || 0), 0) / done.length).toFixed(1) : '–';
+    const cityOpts = [...new Set(s.places.map(p => p.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
+    const districtOpts = [...new Set(s.places.filter(p => !s.city || p.city === s.city).map(p => p.district).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
+    const q = s.q.trim().toLocaleLowerCase('tr');
+    let list = s.places.filter(p =>
+      (s.tab === 'all' || (s.tab === 'done' ? p.status === 'done' : p.status !== 'done')) &&
+      (!s.city || p.city === s.city) && (!s.district || p.district === s.district) && (!s.cat || p.cat === s.cat) &&
+      (!q || (p.name + ' ' + (p.note || '')).toLocaleLowerCase('tr').includes(q)));
+    list = list.slice().sort((a, b) => (a.status === 'done') - (b.status === 'done') || (+b.rating || 0) - (+a.rating || 0) || (b.createdAt || 0) - (a.createdAt || 0));
+    const selId = s.sel && list.some(p => p.id === s.sel) ? s.sel : (list[0] && list[0].id);
+    const selP = list.find(p => p.id === selId);
+    const tabDefs = [
+      { k: 'all', label: 'Hepsi', count: s.places.length, title: 'Bütün defter', sub: 'Gidilen, gidilecek, hayal edilen.' },
+      { k: 'todo', label: 'Bekleme Salonu', count: todo.length, title: 'Bekleme Salonu', sub: 'Adını duyduk, mide randevu bekliyor.' },
+      { k: 'done', label: 'Tabak Sıyırdıklarım', count: done.length, title: 'Tabak Sıyırdıklarım', sub: 'Gittik, yedik, hüküm verdik.' }
+    ];
+    const tab = tabDefs.find(t => t.k === s.tab);
+    const f = {};
+    ['name', 'city', 'district', 'cat', 'note', 'mapUrl', 'rating'].forEach(k => f[k] = e => { const v = e.target.value; this.setState(st => ({ form: Object.assign({}, st.form, { [k]: k === 'rating' ? +v : v }) })); });
+    const fd = s.form.status === 'done';
+    const sel = selP ? Object.assign({
+      name: selP.name, cat: selP.cat, note: selP.note, hasNote: !!selP.note,
+      address: selP.address || [selP.district, selP.city].filter(Boolean).join(', '),
+      isDone: selP.status === 'done', rating: selP.rating,
+      hasG: !!selP.googleRating, g: selP.googleRating, gCount: (selP.googleCount || 0).toLocaleString('tr-TR'),
+      statusLabel: selP.status === 'done' ? 'Tabak sıyrıldı' : 'Bekleme salonunda'
+    }, this.urls(selP)) : {};
+    const login = async () => { const ok = await this.store.login(s.pw); this.setState(ok ? { lockOpen: false, pw: '', pwErr: false } : { pwErr: true }); };
+    return {
+      admin: s.admin, doneCount: done.length, todoCount: todo.length, cityCount: cityOpts.length, avg,
+      tabs: tabDefs.map(t => ({ label: t.label, count: t.count, bg: s.tab === t.k ? accent : 'transparent', color: s.tab === t.k ? bg : ink, onClick: () => this.setState({ tab: t.k }) })),
+      tabTitle: tab.title, tabSub: tab.sub,
+      city: s.city, district: s.district, q: s.q, cityOpts, districtOpts,
+      setCity: e => this.setState({ city: e.target.value, district: '' }),
+      setDistrict: e => this.setState({ district: e.target.value }),
+      setQ: e => this.setState({ q: e.target.value }),
+      chips: [''].concat(s.cats).map(c => { const on = s.cat === c; return { label: c || 'Tümü', bg: on ? ink : 'transparent', color: on ? bg : ink, border: on ? ink : 'var(--color-divider)', onClick: () => this.setState({ cat: c }) }; }),
+      empty: list.length === 0,
+      rows: list.map((p, i) => ({
+        n: String(i + 1).padStart(2, '0'), name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat,
+        note: p.note, hasNote: !!p.note, photo: p.photoUrl, hasPhoto: !!p.photoUrl && P.showPhotos !== false,
+        hasG: !!p.googleRating, g: p.googleRating,
+        isDone: p.status === 'done', isTodo: p.status !== 'done', rating: p.rating, ratingLabel: this.label(p.rating),
+        bg: p.id === selId ? 'var(--color-surface)' : 'transparent', numColor: p.id === selId ? accent : 'var(--color-neutral-600)',
+        onClick: () => this.setState({ sel: p.id }),
+        onEdit: e => { e.stopPropagation(); this.openForm(p); },
+        onWent: e => { e.stopPropagation(); this.openForm(Object.assign({}, p, { status: 'done', rating: p.rating || 8 })); }
+      })),
+      hasSel: !!selP, sel, mapFilter: P.mapGray === false ? 'none' : 'grayscale(1) contrast(1.05)',
+      modeLabel: s.mode === 'firebase' ? '· Firebase bağlı' : '· Yerel mod',
+      lockOpen: s.lockOpen, pw: s.pw, pwErr: s.pwErr,
+      toggleLock: () => this.setState({ lockOpen: !s.lockOpen, pwErr: false }),
+      setPw: e => this.setState({ pw: e.target.value, pwErr: false }),
+      pwKey: e => { if (e.key === 'Enter') login(); },
+      tryLogin: login,
+      logout: () => this.store.logout(),
+      openAdd: () => this.openForm(),
+      openCats: () => this.setState({ modal: 'cats', newCat: '' }),
+      closeModal: () => this.setState({ modal: null }),
+      stop: e => e.stopPropagation(),
+      placeModal: s.modal === 'place', catModal: s.modal === 'cats', setModal: s.modal === 'settings',
+      openSettings: () => this.setState({ modal: 'settings', keyDraft: this.key(), testMsg: '', keyShow: false }),
+      keyDraft: s.keyDraft, setKeyDraft: e => this.setState({ keyDraft: e.target.value, testMsg: '' }),
+      keyType: s.keyShow ? 'text' : 'password', keyShowLabel: s.keyShow ? 'Gizle' : 'Göster',
+      toggleKeyShow: () => this.setState({ keyShow: !s.keyShow }),
+      saveKey: async () => { await this.store.saveSettings({ mapsKey: s.keyDraft.trim() }); this.setState({ testOk: true, testMsg: 'Kaydedildi.' }); },
+      testKey: () => this.testKey(), testLabel: s.testing ? 'Deneniyor…' : 'Dene',
+      testMsg: s.testMsg, testColor: s.testOk === false ? 'var(--color-accent-700)' : 'var(--color-text)',
+      siteOrigin: location.origin.indexOf('http') === 0 ? location.origin : 'https://KULLANICIADIN.github.io',
+      keyWhere: s.mode === 'firebase' ? 'Firebase\'de saklanır, her cihazda geçerli' : 'şimdilik bu tarayıcıda saklanır (Firebase bağlanınca her cihazda geçerli olur)',
+      formHasG: !!s.form.googleRating, formHasPhoto: !!s.form.photoUrl, formGCount: (s.form.googleCount || 0).toLocaleString('tr-TR'),
+      refreshG: async () => { try { const r = await this.db.getPlace(this.key(), s.form.placeId); this.fill(Object.assign(r, { name: s.form.name })); } catch (e) { this.setState({ searchNote: 'Yenilenemedi: ' + e.message }); } },
+      form: s.form, f, cats: s.cats,
+      formTitle: s.form.id ? 'Mekânı düzenle' : 'Yeni mekân',
+      formDone: fd, formRatingLabel: this.label(s.form.rating),
+      noteLabel: fd ? 'Hüküm (not)' : 'Neden gideceğiz? (not)',
+      todoBg: fd ? 'transparent' : accent, todoColor: fd ? ink : bg,
+      doneBg: fd ? accent : 'transparent', doneColor: fd ? bg : ink,
+      setTodo: () => this.setState(st => ({ form: Object.assign({}, st.form, { status: 'todo' }) })),
+      setDone: () => this.setState(st => ({ form: Object.assign({}, st.form, { status: 'done', rating: st.form.rating || 8 }) })),
+      sq: s.sq, setSq: e => this.setState({ sq: e.target.value }), sqKey: e => { if (e.key === 'Enter') this.doSearch(); },
+      doSearch: () => this.doSearch(), searchBtn: s.searching ? 'Bakılıyor…' : 'Getir →', searchNote: s.searchNote,
+      sres: s.sres.map(r => ({ name: r.name, address: r.address, gText: r.googleRating ? ' · Google ' + r.googleRating : '', onPick: () => this.fill(r) })),
+      savePlace: async () => {
+        const fm = s.form; if (!fm.name || !fm.name.trim()) return;
+        const p = Object.assign({}, fm, { id: fm.id || Date.now().toString(36), name: fm.name.trim(), createdAt: fm.createdAt || Date.now() });
+        if (p.status !== 'done') delete p.rating;
+        await this.store.save(p); this.setState({ modal: null, sel: p.id });
+      },
+      delPlace: async () => { if (confirm('Bu mekân defterden silinsin mi?')) { await this.store.remove(s.form.id); this.setState({ modal: null }); } },
+      newCat: s.newCat, setNewCat: e => this.setState({ newCat: e.target.value }),
+      addCat: () => { const c = s.newCat.trim(); if (c && !s.cats.includes(c)) this.store.saveCats(s.cats.concat(c)); this.setState({ newCat: '' }); },
+      catKey: e => { if (e.key === 'Enter') { const c = s.newCat.trim(); if (c && !s.cats.includes(c)) this.store.saveCats(s.cats.concat(c)); this.setState({ newCat: '' }); } },
+      catRows: s.cats.map(c => ({ name: c, count: s.places.filter(p => p.cat === c).length || '', onDel: () => this.store.saveCats(s.cats.filter(x => x !== c)) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
