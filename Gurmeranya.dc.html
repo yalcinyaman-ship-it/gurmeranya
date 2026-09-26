@@ -99,7 +99,7 @@ input[type=range]{accent-color:var(--color-accent)}
         <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:36px 88px minmax(0,1fr) auto;gap:var(--space-4);align-items:start;padding:var(--space-4) var(--space-2);border-bottom:1px solid var(--color-divider);cursor:pointer;background:{{ r.bg }};" style-hover="background:var(--color-surface);">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:14px;padding-top:2px;color:{{ r.numColor }};">{{ r.n }}</div>
           <div style="aspect-ratio:1;background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-neutral-300) 6px 12px);position:relative;overflow:hidden;">
-            <sc-if value="{{ r.hasPhoto }}"><img class="grayscale" src="{{ r.photo }}" alt="{{ r.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></sc-if>
+            <sc-if value="{{ r.hasPhoto }}"><img src="{{ r.photo }}" alt="{{ r.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{{ photoFilter }};"></sc-if>
           </div>
           <div style="min-width:0;display:flex;flex-direction:column;gap:6px;">
             <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;line-height:1.15;">{{ r.name }}</div>
@@ -295,7 +295,7 @@ input[type=range]{accent-color:var(--color-accent)}
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;photoGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
 class Component extends DCLogic {
   state = { places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sel: null, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
 
@@ -426,7 +426,7 @@ class Component extends DCLogic {
         onEdit: e => { e.stopPropagation(); this.openForm(p); },
         onWent: e => { e.stopPropagation(); this.openForm(Object.assign({}, p, { status: 'done', rating: p.rating || 8 })); }
       })),
-      hasSel: !!selP, sel, mapFilter: P.mapGray === false ? 'none' : 'grayscale(1) contrast(1.05)',
+      photoFilter: P.photoGray ? 'grayscale(1) contrast(1.08)' : 'none', hasSel: !!selP, sel, mapFilter: P.mapGray === false ? 'none' : 'grayscale(1) contrast(1.05)',
       modeLabel: s.mode === 'firebase' ? '· Firebase bağlı' : '· Yerel mod',
       lockOpen: s.lockOpen, pw: s.pw, pwErr: s.pwErr,
       toggleLock: () => this.setState({ lockOpen: !s.lockOpen, pwErr: false }),
