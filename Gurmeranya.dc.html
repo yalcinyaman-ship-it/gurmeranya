@@ -19,7 +19,7 @@ input[type=range]{accent-color:var(--color-accent)}
 .gr-bar{position:sticky;top:0;z-index:30;background:var(--color-bg);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)}
 .gr-main{flex:1;display:grid;grid-template-columns:minmax(400px,5fr) 7fr;min-height:0}
 .gr-list{min-width:0;border-right:2px solid var(--color-divider)}
-.gr-mappane{position:relative;min-width:0;background:var(--color-surface)}
+.gr-mappane{position:relative;min-width:0;background:var(--color-surface);isolation:isolate;z-index:0}
 #gr-map{position:absolute;inset:0;background:var(--color-surface)}
 #gr-map.gray .leaflet-tile-pane{filter:grayscale(1) contrast(1.05) brightness(1.04)}
 .gr-chips{display:flex;gap:var(--space-2);overflow-x:auto;scrollbar-width:none}
@@ -46,6 +46,25 @@ input[type=range]{accent-color:var(--color-accent)}
 .leaflet-tooltip{font-family:var(--font-heading);font-weight:800;font-size:12px;border-radius:0;border:1.5px solid var(--color-text);box-shadow:none;padding:3px 7px}
 .leaflet-bar a{border-radius:0!important;color:var(--color-text)}
 .gr-fab{display:none}
+.btn-primary,.gr-mapbtn,.gr-tab,.gr-chip{transition:transform .12s ease,box-shadow .12s ease,background .12s ease}
+.btn-primary:hover,.gr-mapbtn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--color-text)}
+.btn-primary:active,.gr-mapbtn:active{transform:none;box-shadow:none}
+.gr-tab:hover{background:color-mix(in srgb,var(--color-accent) 12%,transparent)}
+.gr-tab.on:hover{background:var(--color-accent)}
+.gr-chip:hover{transform:translateY(-2px);box-shadow:0 2px 0 var(--color-text)}
+.gr-emo{display:inline-block;transition:transform .2s}
+.gr-chip:hover .gr-emo,.gr-tab:hover .gr-emo{transform:scale(1.25) rotate(-10deg)}
+.gr-dice:hover .gr-die{animation:gr-wig .5s ease}
+.gr-dice.rolling .gr-die{animation:gr-spin .35s linear infinite}
+.gr-roll{display:inline-block;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+.gr-q{display:inline-block;transform-origin:50% 90%;animation:gr-bob 2.6s ease-in-out infinite}
+.gr-logo{display:inline-block;transition:transform .3s}
+.gr-brand:hover .gr-logo{transform:rotate(-20deg) scale(1.15)}
+.gr-stat{display:inline-flex;align-items:baseline;gap:4px}
+@keyframes gr-wig{0%,100%{transform:rotate(0)}25%{transform:rotate(-18deg)}60%{transform:rotate(14deg)}}
+@keyframes gr-spin{to{transform:rotate(360deg)}}
+@keyframes gr-bob{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-12deg)}86%{transform:rotate(9deg)}93%{transform:rotate(-4deg)}}
+@media (prefers-reduced-motion:reduce){.gr-q,.gr-dice .gr-die{animation:none!important}.btn-primary:hover,.gr-mapbtn:hover,.gr-chip:hover{transform:none}}
 @media (min-width:900px){
   .gr-root{height:100vh;overflow:hidden}
   .gr-list{overflow-y:auto;overscroll-behavior:contain}
@@ -74,21 +93,21 @@ input[type=range]{accent-color:var(--color-accent)}
 <div class="gr-root {{ rootCls }}">
   <header style="border-bottom:2px solid var(--color-divider);">
     <div class="gr-wrap" style="padding-top:var(--space-3);padding-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
-      <div style="margin-right:auto;display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
-        <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;letter-spacing:0.02em;">GURMERANYA<span style="color:var(--color-accent);">.</span></div>
+      <div class="gr-brand" style="margin-right:auto;display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
+        <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;letter-spacing:0.02em;"><span class="gr-logo">🍴</span> GURMERANYA<span style="color:var(--color-accent);">.</span></div>
         <div style="font-size:13px;color:var(--color-neutral-700);">Bir midenin seyir defteri</div>
       </div>
       <div style="display:flex;gap:var(--space-4);align-items:baseline;font-size:12px;color:var(--color-neutral-700);flex-wrap:wrap;">
-        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ doneCount }}</strong> sıyrıldı</span>
-        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ todoCount }}</strong> bekliyor</span>
-        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ cityCount }}</strong> şehir</span>
-        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-accent);">{{ avg }}</strong> ort. puan</span>
+        <span class="gr-stat" title="sıyrıldı"><span>😋</span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ doneCount }}</strong> sıyrıldı</span>
+        <span class="gr-stat" title="bekliyor"><span>⏳</span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ todoCount }}</strong> bekliyor</span>
+        <span class="gr-stat" title="şehir"><span>📍</span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ cityCount }}</strong> şehir</span>
+        <span class="gr-stat" title="ort. puan"><span>⭐</span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-accent);">{{ avg }}</strong> ort. puan</span>
       </div>
       <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:var(--space-2);">
           <button class="btn btn-secondary" onClick="{{ openSettings }}">Ayarlar</button>
           <button class="btn btn-secondary" onClick="{{ openCats }}">Kategoriler</button>
-          <button class="btn btn-primary" onClick="{{ openAdd }}">Yeni mekân +</button>
+          <button class="btn btn-primary" onClick="{{ openAdd }}">＋ Yeni mekân</button>
         </div>
       </sc-if>
     </div>
@@ -99,7 +118,7 @@ input[type=range]{accent-color:var(--color-accent)}
       <div class="gr-barrow" style="display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;">
         <div class="gr-tabs" style="display:flex;border:1px solid var(--color-divider);flex-wrap:wrap;">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
-            <button onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:var(--space-2);padding:9px 14px;border:none;cursor:pointer;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ t.bg }};color:{{ t.color }};">{{ t.label }}<span style="font-weight:400;font-size:12px;opacity:0.75;">{{ t.count }}</span></button>
+            <button class="{{ t.cls }}" onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:var(--space-2);padding:9px 14px;border:none;cursor:pointer;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ t.bg }};color:{{ t.color }};"><span class="gr-emo">{{ t.emo }}</span>{{ t.label }}<span style="font-weight:400;font-size:12px;opacity:0.75;">{{ t.count }}</span></button>
           </sc-for>
         </div>
         <div class="gr-ctrls" style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-left:auto;align-items:center;">
@@ -119,7 +138,7 @@ input[type=range]{accent-color:var(--color-accent)}
       </div>
       <div class="gr-chips">
         <sc-for list="{{ chips }}" as="c" hint-placeholder-count="8">
-          <button onClick="{{ c.onClick }}" style="flex:none;padding:6px 12px;cursor:pointer;font-family:var(--font-body);font-size:13px;white-space:nowrap;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};">{{ c.label }}<span style="opacity:0.6;font-size:11px;margin-left:5px;">{{ c.count }}</span></button>
+          <button class="gr-chip" onClick="{{ c.onClick }}" style="flex:none;padding:6px 12px;cursor:pointer;font-family:var(--font-body);font-size:13px;white-space:nowrap;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};"><span class="gr-emo" style="margin-right:5px;">{{ c.emo }}</span>{{ c.label }}<span style="opacity:0.6;font-size:11px;margin-left:5px;">{{ c.count }}</span></button>
         </sc-for>
       </div>
     </div>
@@ -129,9 +148,10 @@ input[type=range]{accent-color:var(--color-accent)}
     <div class="gr-list" id="gr-list">
       <div style="padding:var(--space-6) var(--space-6) var(--space-4);border-bottom:2px solid var(--color-divider);">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-3);flex-wrap:wrap;">
-          <h1 style="margin:0;font-size:clamp(40px,4.6vw,68px);line-height:0.9;letter-spacing:-0.045em;">Bugün ne yesek<span style="color:var(--color-accent);">?</span></h1>
-          <button class="btn btn-primary" onClick="{{ pickRandom }}" style="justify-content:space-between;gap:var(--space-2);">Bana bir yer seç <span>→</span></button>
+          <h1 style="margin:0;font-size:clamp(40px,4.6vw,68px);line-height:0.9;letter-spacing:-0.045em;">Bugün ne yesek<span class="gr-q" style="color:var(--color-accent);">?</span></h1>
+          <button class="{{ diceCls }}" onClick="{{ pickRandom }}" style="justify-content:space-between;gap:var(--space-2);"><span class="gr-die">🎲</span><span class="gr-roll">{{ diceLabel }}</span></button>
         </div>
+        <div style="margin-top:var(--space-2);font-size:14px;color:var(--color-neutral-700);font-style:italic;">{{ tagline }}</div>
         <div style="margin-top:var(--space-4);display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:18px;">{{ tabTitle }} <span style="color:var(--color-accent);">{{ listCount }}</span></div>
           <div style="font-size:12px;color:var(--color-neutral-700);">{{ tabSub }}</div>
@@ -152,7 +172,7 @@ input[type=range]{accent-color:var(--color-accent)}
           <div style="min-width:0;display:flex;flex-direction:column;gap:3px;">
             <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;line-height:1.15;">{{ r.name }}</div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--color-neutral-700);">
-              <span>{{ r.loc }}</span><span>·</span><span>{{ r.cat }}</span><sc-if value="{{ r.hasG }}"><span>·</span><span style="color:var(--color-text);">G <strong>{{ r.g }}</strong></span></sc-if><sc-if value="{{ r.hasDist }}"><span>·</span><span style="color:var(--color-accent-700);font-weight:700;">{{ r.dist }}</span></sc-if>
+              <span>{{ r.loc }}</span><span>·</span><span>{{ r.emo }} {{ r.cat }}</span><sc-if value="{{ r.hasG }}"><span>·</span><span style="color:var(--color-text);">G <strong>{{ r.g }}</strong></span></sc-if><sc-if value="{{ r.hasDist }}"><span>·</span><span style="color:var(--color-accent-700);font-weight:700;">{{ r.dist }}</span></sc-if>
             </div>
             <sc-if value="{{ r.hasNote }}"><div class="gr-clamp" style="font-size:13px;line-height:1.4;color:var(--color-neutral-800);">{{ r.note }}</div></sc-if>
           </div>
@@ -195,7 +215,7 @@ input[type=range]{accent-color:var(--color-accent)}
           <sc-if value="{{ sel.hasPhoto }}"><div class="gr-cardimg" style="height:140px;position:relative;overflow:hidden;border-bottom:2px solid var(--color-text);"><img src="{{ sel.photo }}" alt="{{ sel.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{{ photoFilter }};"></div></sc-if>
           <div style="padding:var(--space-4) var(--space-4) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);">
-              <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">{{ sel.statusLabel }} · {{ sel.cat }}</div>
+              <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">{{ sel.statusLabel }} · {{ sel.emo }} {{ sel.cat }}</div>
               <button class="btn btn-icon" onClick="{{ closeSel }}" title="Kapat" style="font-size:20px;width:28px;height:28px;">×</button>
             </div>
             <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;">
@@ -229,7 +249,7 @@ input[type=range]{accent-color:var(--color-accent)}
   <button class="gr-fab" onClick="{{ toggleView }}">{{ fabLabel }}</button>
 
   <sc-if value="{{ placeModal }}" hint-placeholder-val="{{ false }}">
-    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;overflow-y:auto;align-items:start;">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:3000;overflow-y:auto;align-items:start;">
       <div onClick="{{ stop }}" style="width:min(640px,100%);margin:var(--space-8) auto;background:var(--color-bg);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;">
         <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">{{ formTitle }}</div>
@@ -297,7 +317,7 @@ input[type=range]{accent-color:var(--color-accent)}
   </sc-if>
 
   <sc-if value="{{ setModal }}" hint-placeholder-val="{{ false }}">
-    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;overflow-y:auto;">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:3000;overflow-y:auto;">
       <div onClick="{{ stop }}" style="width:min(560px,100%);background:var(--color-bg);box-shadow:var(--shadow-lg);">
         <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">Ayarlar</div>
@@ -328,7 +348,7 @@ input[type=range]{accent-color:var(--color-accent)}
   </sc-if>
 
   <sc-if value="{{ catModal }}" hint-placeholder-val="{{ false }}">
-    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:3000;">
       <div onClick="{{ stop }}" style="width:min(460px,100%);background:var(--color-bg);box-shadow:var(--shadow-lg);">
         <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">Kategoriler</div>
@@ -355,7 +375,7 @@ input[type=range]{accent-color:var(--color-accent)}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;photoGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
 class Component extends DCLogic {
-  state = { places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sort: 'smart', sel: null, view: 'list', me: null, locating: false, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
+  state = { rolling: false, rollName: '', tagline: ['Döner mi, tatlı mı? Neden ikisi değil.', 'Mide gurulduyorsa doğru yerdesin.', 'Diyet pazartesi başlar. Hangi pazartesi, belli değil.', 'Bir tabak daha sıyıralım.', 'Açken karar verilmez ama deneriz.', 'Kokusu sokağın başından gelir.'][Math.floor(Math.random() * 6)], places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sort: 'smart', sel: null, view: 'list', me: null, locating: false, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
 
   async componentDidMount() {
     this.onKey = e => { if (e.key === 'Escape') this.setState(s => s.modal ? { modal: null } : { sel: null }); };
@@ -499,6 +519,13 @@ class Component extends DCLogic {
 
   fmtKm(d) { return d == null ? '' : d < 1 ? Math.round(d * 1000 / 10) * 10 + ' m' : (d < 10 ? d.toFixed(1).replace('.', ',') : Math.round(d)) + ' km'; }
 
+  emo(c) {
+    const m = { 'kahvalt': '🍳', 'tavuk': '🍗', 'döner': '🥙', 'kebap': '🍢', 'esnaf': '🍲', 'tatlı': '🍰', 'baklava': '🍯', 'balık': '🐟', 'pide': '🫓', 'lahmacun': '🫓', 'kahve': '☕', 'sokak': '🌯', 'kavurma': '🥩', 'köfte': '🍖', 'mantı': '🥟', 'pizza': '🍕', 'burger': '🍔', 'çorba': '🥣', 'dondurma': '🍦' };
+    const k = (c || '').toLocaleLowerCase('tr'); if (!k) return '🍽️';
+    for (const w in m) if (k.includes(w)) return m[w];
+    return '🍽️';
+  }
+
   label(r) {
     r = +r;
     if (r >= 10) return 'Tabağı yaladım';
@@ -588,9 +615,9 @@ class Component extends DCLogic {
     this.list = list; this.selId = selP ? selP.id : null;
     this.pmap = {}; s.places.forEach(p => this.pmap[p.id] = p);
     const tabDefs = [
-      { k: 'all', label: 'Hepsi', count: s.places.length, title: 'Bütün defter', sub: 'Gidilen, gidilecek, hayal edilen.' },
-      { k: 'todo', label: 'Bekleme Salonu', count: todo.length, title: 'Bekleme Salonu', sub: 'Adını duyduk, mide randevu bekliyor.' },
-      { k: 'done', label: 'Tabak Sıyırdıklarım', count: done.length, title: 'Tabak Sıyırdıklarım', sub: 'Gittik, yedik, hüküm verdik.' }
+      { k: 'all', emo: '🍴', label: 'Hepsi', count: s.places.length, title: 'Bütün defter', sub: 'Gidilen, gidilecek, hayal edilen.' },
+      { k: 'todo', emo: '⏳', label: 'Bekleme Salonu', count: todo.length, title: 'Bekleme Salonu', sub: 'Adını duyduk, mide randevu bekliyor.' },
+      { k: 'done', emo: '😋', label: 'Tabak Sıyırdıklarım', count: done.length, title: 'Tabak Sıyırdıklarım', sub: 'Gittik, yedik, hüküm verdik.' }
     ];
     const tab = tabDefs.find(t => t.k === s.tab);
     const catBase = s.places.filter(p => inTab(p) && inPlace(p));
@@ -598,7 +625,7 @@ class Component extends DCLogic {
     ['name', 'city', 'district', 'cat', 'note', 'mapUrl', 'rating'].forEach(k => f[k] = e => { const v = e.target.value; this.setState(st => ({ form: Object.assign({}, st.form, { [k]: k === 'rating' ? +v : v }) })); });
     const fd = s.form.status === 'done';
     const sel = selP ? Object.assign({
-      name: selP.name, cat: selP.cat, note: selP.note, hasNote: !!selP.note,
+      name: selP.name, cat: selP.cat, emo: this.emo(selP.cat), note: selP.note, hasNote: !!selP.note,
       address: selP.address || [selP.district, selP.city].filter(Boolean).join(', '),
       isDone: selP.status === 'done', isTodo: selP.status !== 'done', rating: selP.rating,
       photo: selP.photoUrl, hasPhoto: !!selP.photoUrl && P.showPhotos !== false,
@@ -611,7 +638,7 @@ class Component extends DCLogic {
     return {
       admin: s.admin, doneCount: done.length, todoCount: todo.length, cityCount: cityOpts.length, avg,
       rootCls: s.view === 'map' ? 'mob-map' : '',
-      tabs: tabDefs.map(t => ({ label: t.label, count: t.count, bg: s.tab === t.k ? accent : 'transparent', color: s.tab === t.k ? bg : ink, onClick: () => this.setState({ tab: t.k }) })),
+      tabs: tabDefs.map(t => ({ emo: t.emo, cls: 'gr-tab' + (s.tab === t.k ? ' on' : ''), label: t.label, count: t.count, bg: s.tab === t.k ? accent : 'transparent', color: s.tab === t.k ? bg : ink, onClick: () => this.setState({ tab: t.k }) })),
       tabTitle: tab.title, tabSub: tab.sub, listCount: list.length,
       city: s.city, district: s.district, q: s.q, cityOpts, districtOpts,
       setCity: e => this.setState({ city: e.target.value, district: '' }),
@@ -622,21 +649,32 @@ class Component extends DCLogic {
       setSort: e => { const v = e.target.value; if (v === 'near' && !s.me) this.locate(true); else this.setState({ sort: v }); },
       hasFilters: !!(s.city || s.district || s.cat || s.q || s.tab !== 'all'),
       clearFilters: () => this.setState({ city: '', district: '', cat: '', q: '', tab: 'all' }),
-      chips: [''].concat(s.cats).map(c => { const on = s.cat === c, n = c ? catBase.filter(p => p.cat === c).length : catBase.length; return { label: c || 'Tümü', count: n || '', bg: on ? ink : 'transparent', color: on ? bg : ink, border: on ? ink : 'var(--color-divider)', onClick: () => this.setState({ cat: c }) }; }),
+      chips: [''].concat(s.cats).map(c => { const on = s.cat === c, n = c ? catBase.filter(p => p.cat === c).length : catBase.length; return { label: c || 'Tümü', emo: c ? this.emo(c) : '✨', count: n || '', bg: on ? ink : 'transparent', color: on ? bg : ink, border: on ? ink : 'var(--color-divider)', onClick: () => this.setState({ cat: c }) }; }),
       empty: list.length === 0,
       rows: list.map(p => ({
         domId: 'row-' + p.id, cls: 'gr-row' + (p.id === this.selId ? ' on' : ''),
-        name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat,
+        name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat, emo: this.emo(p.cat),
         note: p.note, hasNote: !!p.note, photo: p.photoUrl, hasPhoto: !!p.photoUrl && P.showPhotos !== false,
         hasG: !!p.googleRating, g: p.googleRating, hasDist: dist[p.id] != null, dist: this.fmtKm(dist[p.id]),
         isDone: p.status === 'done', isTodo: p.status !== 'done', rating: p.rating, ratingLabel: this.label(p.rating),
         onClick: () => { this.select(p.id); if (this.isMobile()) setView('map'); }
       })),
+      tagline: s.tagline,
+      diceCls: 'btn btn-primary gr-dice' + (s.rolling ? ' rolling' : ''),
+      diceLabel: s.rolling ? s.rollName : 'Bana bir yer seç',
       pickRandom: () => {
+        if (s.rolling) return;
         const pool = list.filter(p => p.status !== 'done').length ? list.filter(p => p.status !== 'done') : list;
         if (!pool.length) return;
         const p = pool[Math.floor(Math.random() * pool.length)];
-        this.select(p.id, true); if (this.isMobile()) setView('map');
+        const fast = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let n = fast ? 0 : 10;
+        const tick = () => {
+          if (n-- > 0) { this.setState({ rolling: true, rollName: pool[Math.floor(Math.random() * pool.length)].name }); setTimeout(tick, 70 + (10 - n) * 12); return; }
+          this.setState({ rolling: false, rollName: '' });
+          this.select(p.id, true); if (this.isMobile()) setView('map');
+        };
+        tick();
       },
       photoFilter: P.photoGray ? 'grayscale(1) contrast(1.08)' : 'none', hasSel: !!selP, sel,
       closeSel: () => this.setState({ sel: null }),
