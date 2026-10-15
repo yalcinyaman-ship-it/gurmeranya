@@ -14,14 +14,75 @@ body{margin:0;background:var(--color-bg);color:var(--color-text)}
 a{color:var(--color-accent)}a:hover{color:var(--color-accent-700)}
 select.input{appearance:auto}
 input[type=range]{accent-color:var(--color-accent)}
+.gr-root{min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg);font-family:var(--font-body)}
+.gr-wrap{max-width:1440px;margin:0 auto;width:100%;box-sizing:border-box;padding:0 var(--space-6)}
+.gr-bar{position:sticky;top:0;z-index:30;background:var(--color-bg);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)}
+.gr-main{flex:1;display:grid;grid-template-columns:minmax(400px,5fr) 7fr;min-height:0}
+.gr-list{min-width:0;border-right:2px solid var(--color-divider)}
+.gr-mappane{position:relative;min-width:0;background:var(--color-surface)}
+#gr-map{position:absolute;inset:0;background:var(--color-surface)}
+#gr-map.gray .leaflet-tile-pane{filter:grayscale(1) contrast(1.05) brightness(1.04)}
+.gr-chips{display:flex;gap:var(--space-2);overflow-x:auto;scrollbar-width:none}
+.gr-chips::-webkit-scrollbar{display:none}
+.gr-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:var(--space-3);align-items:center;padding:var(--space-3) var(--space-6);border-bottom:1px solid color-mix(in srgb,var(--color-text) 14%,transparent);cursor:pointer;position:relative}
+.gr-row:hover{background:var(--color-surface)}
+.gr-row.on{background:var(--color-surface)}
+.gr-row.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--color-accent)}
+.gr-thumb{width:64px;height:64px;background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-neutral-300) 6px 12px);position:relative;overflow:hidden}
+.gr-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gr-clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.gr-card{position:absolute;left:var(--space-4);bottom:var(--space-4);width:min(440px,calc(100% - 2*var(--space-4)));max-height:calc(100% - 2*var(--space-4));overflow:auto;z-index:800;background:var(--color-bg);border:2px solid var(--color-text);box-shadow:var(--shadow-lg)}
+.gr-mapbtns{position:absolute;top:var(--space-4);left:var(--space-4);z-index:800;display:flex;gap:var(--space-2);flex-wrap:wrap}
+.gr-mapbtn{background:var(--color-bg);border:2px solid var(--color-text);padding:7px 12px;font-family:var(--font-heading);font-weight:800;font-size:13px;cursor:pointer;color:var(--color-text);box-shadow:var(--shadow-sm)}
+.gr-mapbtn:hover{background:var(--color-text);color:var(--color-bg)}
+.gr-pin{width:14px;height:14px;box-sizing:border-box;border-radius:50%;background:var(--color-text);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .15s}
+.gr-pin.d{width:28px;height:28px;background:var(--color-accent);color:#fff;font:800 13px/24px var(--font-heading);text-align:center}
+.gr-pin.on{transform:scale(1.5);box-shadow:0 0 0 4px color-mix(in srgb,var(--color-accent) 35%,transparent),0 2px 8px rgba(0,0,0,.4)}
+.gr-pin.on:not(.d){background:var(--color-accent)}
+.gr-me{width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-sizing:border-box;box-shadow:0 0 0 6px rgba(26,115,232,.25)}
+.gr-cl{width:38px;height:38px;box-sizing:border-box;background:var(--color-text);color:var(--color-bg);border:2px solid #fff;font:800 14px/34px var(--font-heading);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.gr-cl.big{width:46px;height:46px;line-height:42px;background:var(--color-accent);color:#fff}
+.leaflet-container{font-family:var(--font-body)}
+.leaflet-tooltip{font-family:var(--font-heading);font-weight:800;font-size:12px;border-radius:0;border:1.5px solid var(--color-text);box-shadow:none;padding:3px 7px}
+.leaflet-bar a{border-radius:0!important;color:var(--color-text)}
+.gr-fab{display:none}
+@media (min-width:900px){
+  .gr-root{height:100vh;overflow:hidden}
+  .gr-list{overflow-y:auto;overscroll-behavior:contain}
+}
+@media (max-width:899px){
+  .gr-wrap{padding:0 var(--space-4)}
+  .gr-main{display:block}
+  .gr-list{border-right:none}
+  .gr-row{padding:var(--space-3) var(--space-4)}
+  .gr-barrow{flex-direction:column;align-items:stretch!important}
+  .gr-tabs,.gr-ctrls{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin-left:0!important}
+  .gr-tabs>*,.gr-ctrls>*{flex:none}
+  .gr-tabs button{padding:8px 12px!important;font-size:13px!important;white-space:nowrap}
+  .gr-ctrls .input{min-width:0!important;padding-top:7px;padding-bottom:7px}
+  .gr-ctrls input.input{width:150px!important}
+  .gr-mappane{display:none;height:calc(100dvh - var(--gr-barh,120px));position:sticky;top:var(--gr-barh,120px)}
+  .gr-root.mob-map .gr-mappane{display:block}
+  .gr-root.mob-map .gr-list{display:none}
+  .gr-root.mob-map .gr-foot{display:none}
+  .gr-card{left:var(--space-2);right:var(--space-2);bottom:var(--space-2);width:auto;max-height:62%}
+  .gr-card .gr-cardimg{height:96px!important}
+  .gr-fab{display:flex;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:900;align-items:center;gap:8px;padding:12px 20px;background:var(--color-text);color:var(--color-bg);border:none;font-family:var(--font-heading);font-weight:800;font-size:15px;box-shadow:var(--shadow-lg);cursor:pointer}
+}
 </style>
 </helmet>
-<div style="min-height:100vh;background:var(--color-bg);font-family:var(--font-body);">
+<div class="gr-root {{ rootCls }}">
   <header style="border-bottom:2px solid var(--color-divider);">
-    <div style="max-width:1320px;margin:0 auto;padding:var(--space-4) var(--space-6);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+    <div class="gr-wrap" style="padding-top:var(--space-3);padding-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
       <div style="margin-right:auto;display:flex;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
         <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;letter-spacing:0.02em;">GURMERANYA<span style="color:var(--color-accent);">.</span></div>
         <div style="font-size:13px;color:var(--color-neutral-700);">Bir midenin seyir defteri</div>
+      </div>
+      <div style="display:flex;gap:var(--space-4);align-items:baseline;font-size:12px;color:var(--color-neutral-700);flex-wrap:wrap;">
+        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ doneCount }}</strong> sıyrıldı</span>
+        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ todoCount }}</strong> bekliyor</span>
+        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-text);">{{ cityCount }}</strong> şehir</span>
+        <span><strong style="font-family:var(--font-heading);font-size:18px;color:var(--color-accent);">{{ avg }}</strong> ort. puan</span>
       </div>
       <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:var(--space-2);">
@@ -33,142 +94,139 @@ input[type=range]{accent-color:var(--color-accent)}
     </div>
   </header>
 
-  <section style="max-width:1320px;margin:0 auto;padding:var(--space-8) var(--space-6) 0;">
-    <h1 style="margin:0;font-size:clamp(56px,10vw,144px);line-height:0.88;letter-spacing:-0.045em;text-wrap:balance;">Bugün ne<br>yesek<span style="color:var(--color-accent);">?</span></h1>
-    <div style="margin-top:var(--space-8);display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:2px solid var(--color-divider);">
-      <div style="padding:var(--space-4) var(--space-4) var(--space-6) 0;border-right:1px solid var(--color-divider);">
-        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ doneCount }}</div>
-        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Tabak sıyrıldı</div>
-      </div>
-      <div style="padding:var(--space-4) var(--space-4) var(--space-6);border-right:1px solid var(--color-divider);">
-        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ todoCount }}</div>
-        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Bekleme salonunda</div>
-      </div>
-      <div style="padding:var(--space-4) var(--space-4) var(--space-6);border-right:1px solid var(--color-divider);">
-        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;">{{ cityCount }}</div>
-        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Şehirde iz</div>
-      </div>
-      <div style="padding:var(--space-4) var(--space-4) var(--space-6);">
-        <div style="font-family:var(--font-heading);font-weight:800;font-size:48px;line-height:1;color:var(--color-accent);">{{ avg }}</div>
-        <div style="margin-top:var(--space-2);font-size:13px;color:var(--color-neutral-700);">Ortalama puan / 10</div>
-      </div>
-    </div>
-  </section>
-
-  <section style="position:sticky;top:0;z-index:5;background:var(--color-bg);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);">
-    <div style="max-width:1320px;margin:0 auto;padding:var(--space-3) var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);">
-      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;">
-        <div style="display:flex;border:1px solid var(--color-divider);flex-wrap:wrap;">
+  <section class="gr-bar" id="gr-bar">
+    <div class="gr-wrap" style="padding-top:var(--space-3);padding-bottom:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3);">
+      <div class="gr-barrow" style="display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;">
+        <div class="gr-tabs" style="display:flex;border:1px solid var(--color-divider);flex-wrap:wrap;">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
             <button onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:var(--space-2);padding:9px 14px;border:none;cursor:pointer;font-family:var(--font-heading);font-weight:800;font-size:14px;background:{{ t.bg }};color:{{ t.color }};">{{ t.label }}<span style="font-weight:400;font-size:12px;opacity:0.75;">{{ t.count }}</span></button>
           </sc-for>
         </div>
-        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-left:auto;">
-          <select class="input" value="{{ city }}" onChange="{{ setCity }}" style="width:auto;min-width:150px;">
+        <div class="gr-ctrls" style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-left:auto;align-items:center;">
+          <input class="input" value="{{ q }}" onInput="{{ setQ }}" placeholder="Mekân, ilçe, not ara…" style="width:190px;">
+          <select class="input" value="{{ city }}" onChange="{{ setCity }}" style="width:auto;min-width:130px;">
             <option value="">Tüm şehirler</option>
             <sc-for list="{{ cityOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
           </select>
-          <select class="input" value="{{ district }}" onChange="{{ setDistrict }}" style="width:auto;min-width:150px;">
+          <select class="input" value="{{ district }}" onChange="{{ setDistrict }}" style="width:auto;min-width:130px;">
             <option value="">Tüm ilçeler</option>
             <sc-for list="{{ districtOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
           </select>
-          <input class="input" value="{{ q }}" onInput="{{ setQ }}" placeholder="Mekân ara…" style="width:180px;">
+          <select class="input" value="{{ sort }}" onChange="{{ setSort }}" style="width:auto;min-width:140px;">
+            <sc-for list="{{ sortOpts }}" as="o"><option value="{{ o.k }}">{{ o.label }}</option></sc-for>
+          </select>
         </div>
       </div>
-      <div style="display:flex;gap:var(--space-2);overflow-x:auto;">
+      <div class="gr-chips">
         <sc-for list="{{ chips }}" as="c" hint-placeholder-count="8">
-          <button onClick="{{ c.onClick }}" style="flex:none;padding:6px 12px;cursor:pointer;font-family:var(--font-body);font-size:13px;white-space:nowrap;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};">{{ c.label }}</button>
+          <button onClick="{{ c.onClick }}" style="flex:none;padding:6px 12px;cursor:pointer;font-family:var(--font-body);font-size:13px;white-space:nowrap;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};">{{ c.label }}<span style="opacity:0.6;font-size:11px;margin-left:5px;">{{ c.count }}</span></button>
         </sc-for>
       </div>
     </div>
   </section>
 
-  <main style="max-width:1320px;margin:0 auto;padding:var(--space-6) var(--space-6) var(--space-8);display:flex;flex-wrap:wrap;gap:var(--space-8);align-items:flex-start;">
-    <div style="flex:1 1 440px;min-width:0;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:2px solid var(--color-divider);flex-wrap:wrap;">
-        <h2 style="margin:0;font-size:28px;">{{ tabTitle }}</h2>
-        <div style="font-size:13px;color:var(--color-neutral-700);">{{ tabSub }}</div>
+  <main class="gr-main" style="max-width:1440px;margin:0 auto;width:100%;">
+    <div class="gr-list" id="gr-list">
+      <div style="padding:var(--space-6) var(--space-6) var(--space-4);border-bottom:2px solid var(--color-divider);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-3);flex-wrap:wrap;">
+          <h1 style="margin:0;font-size:clamp(40px,4.6vw,68px);line-height:0.9;letter-spacing:-0.045em;">Bugün ne yesek<span style="color:var(--color-accent);">?</span></h1>
+          <button class="btn btn-primary" onClick="{{ pickRandom }}" style="justify-content:space-between;gap:var(--space-2);">Bana bir yer seç <span>→</span></button>
+        </div>
+        <div style="margin-top:var(--space-4);display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:18px;">{{ tabTitle }} <span style="color:var(--color-accent);">{{ listCount }}</span></div>
+          <div style="font-size:12px;color:var(--color-neutral-700);">{{ tabSub }}</div>
+        </div>
+        <sc-if value="{{ hasFilters }}"><button class="btn btn-ghost" onClick="{{ clearFilters }}" style="font-size:12px;margin-top:var(--space-2);padding-left:0;">× Filtreleri temizle</button></sc-if>
       </div>
       <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:var(--space-8) 0;">
+        <div style="padding:var(--space-8) var(--space-6);">
           <div style="font-family:var(--font-heading);font-weight:800;font-size:28px;">Tabak boş.</div>
           <div style="margin-top:var(--space-2);color:var(--color-neutral-700);">Filtreleri gevşet ya da biraz daha acık.</div>
         </div>
       </sc-if>
       <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
-        <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:36px 88px minmax(0,1fr) auto;gap:var(--space-4);align-items:start;padding:var(--space-4) var(--space-2);border-bottom:1px solid var(--color-divider);cursor:pointer;background:{{ r.bg }};" style-hover="background:var(--color-surface);">
-          <div style="font-family:var(--font-heading);font-weight:800;font-size:14px;padding-top:2px;color:{{ r.numColor }};">{{ r.n }}</div>
-          <div style="aspect-ratio:1;background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-neutral-300) 6px 12px);position:relative;overflow:hidden;">
-            <sc-if value="{{ r.hasPhoto }}"><img src="{{ r.photo }}" alt="{{ r.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{{ photoFilter }};"></sc-if>
+        <div class="{{ r.cls }}" id="{{ r.domId }}" onClick="{{ r.onClick }}">
+          <div class="gr-thumb">
+            <sc-if value="{{ r.hasPhoto }}"><img src="{{ r.photo }}" alt="{{ r.name }}" loading="lazy" style="filter:{{ photoFilter }};"></sc-if>
           </div>
-          <div style="min-width:0;display:flex;flex-direction:column;gap:6px;">
-            <div style="font-family:var(--font-heading);font-weight:800;font-size:20px;line-height:1.15;">{{ r.name }}</div>
-            <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap;font-size:12px;color:var(--color-neutral-700);">
-              <span>{{ r.loc }}</span><span class="tag tag-neutral">{{ r.cat }}</span><sc-if value="{{ r.hasG }}"><span style="font-size:12px;color:var(--color-text);">Google <strong>{{ r.g }}</strong></span></sc-if>
+          <div style="min-width:0;display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;line-height:1.15;">{{ r.name }}</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--color-neutral-700);">
+              <span>{{ r.loc }}</span><span>·</span><span>{{ r.cat }}</span><sc-if value="{{ r.hasG }}"><span>·</span><span style="color:var(--color-text);">G <strong>{{ r.g }}</strong></span></sc-if><sc-if value="{{ r.hasDist }}"><span>·</span><span style="color:var(--color-accent-700);font-weight:700;">{{ r.dist }}</span></sc-if>
             </div>
-            <sc-if value="{{ r.hasNote }}"><div style="font-size:14px;line-height:1.5;text-wrap:pretty;">{{ r.note }}</div></sc-if>
-            <sc-if value="{{ admin }}">
-              <div style="display:flex;gap:var(--space-1);margin-top:var(--space-1);">
-                <sc-if value="{{ r.isTodo }}"><button class="btn btn-ghost" onClick="{{ r.onWent }}" style="font-size:13px;">Gittim, puanla →</button></sc-if>
-                <button class="btn btn-ghost" onClick="{{ r.onEdit }}" style="font-size:13px;color:var(--color-text);">Düzenle</button>
-              </div>
-            </sc-if>
+            <sc-if value="{{ r.hasNote }}"><div class="gr-clamp" style="font-size:13px;line-height:1.4;color:var(--color-neutral-800);">{{ r.note }}</div></sc-if>
           </div>
-          <div style="text-align:right;min-width:64px;">
+          <div style="text-align:right;min-width:48px;">
             <sc-if value="{{ r.isDone }}">
-              <div style="font-family:var(--font-heading);font-weight:800;font-size:32px;line-height:1;color:var(--color-accent);">{{ r.rating }}</div>
-              <div style="font-size:11px;color:var(--color-neutral-700);margin-top:4px;">{{ r.ratingLabel }}</div>
+              <div style="font-family:var(--font-heading);font-weight:800;font-size:26px;line-height:1;color:var(--color-accent);">{{ r.rating }}</div>
+              <div style="font-size:10px;color:var(--color-neutral-700);margin-top:3px;white-space:nowrap;">{{ r.ratingLabel }}</div>
             </sc-if>
             <sc-if value="{{ r.isTodo }}"><span class="tag tag-outline">Sırada</span></sc-if>
           </div>
         </div>
       </sc-for>
+      <div class="gr-foot" style="padding:var(--space-6);display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+        <div style="font-size:12px;color:var(--color-neutral-700);">© Gurmeranya · Afiyet olsun. <span style="opacity:0.7;">{{ modeLabel }}</span></div>
+        <div style="display:flex;align-items:center;gap:var(--space-3);position:relative;">
+          <sc-if value="{{ admin }}"><button class="btn btn-ghost" onClick="{{ logout }}" style="font-size:12px;">Mutfaktan çık</button></sc-if>
+          <sc-if value="{{ lockOpen }}">
+            <div style="position:absolute;bottom:44px;right:0;width:260px;padding:var(--space-4);background:var(--color-surface);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:var(--space-2);z-index:10;">
+              <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;">Mutfağa giriş</div>
+              <input class="input" type="password" value="{{ pw }}" onInput="{{ setPw }}" onKeyDown="{{ pwKey }}" placeholder="Şifre">
+              <sc-if value="{{ pwErr }}"><div style="font-size:12px;color:var(--color-accent-700);">Yanlış. Şef seni tanımadı.</div></sc-if>
+              <button class="btn btn-primary btn-block" onClick="{{ tryLogin }}">Gir →</button>
+            </div>
+          </sc-if>
+          <button class="btn btn-icon" onClick="{{ toggleLock }}" title="Mutfak" style="width:28px;height:28px;color:var(--color-neutral-500);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <aside style="flex:1 1 380px;min-width:0;position:sticky;top:132px;border:2px solid var(--color-divider);background:var(--color-bg);">
-      <div style="aspect-ratio:4/3;background:var(--color-surface);position:relative;border-bottom:2px solid var(--color-divider);">
-        <sc-if value="{{ hasSel }}"><iframe src="{{ sel.embed }}" title="Harita" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="position:absolute;inset:0;width:100%;height:100%;border:0;filter:{{ mapFilter }};"></iframe></sc-if>
+    <aside class="gr-mappane">
+      <div id="gr-map"></div>
+      <div class="gr-mapbtns">
+        <button class="gr-mapbtn" onClick="{{ fitAll }}">Tümünü göster</button>
+        <button class="gr-mapbtn" onClick="{{ locateMe }}">{{ locLabel }}</button>
       </div>
-      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
-        <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);">
-          <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">{{ sel.statusLabel }} · {{ sel.cat }}</div>
-          <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;">
-            <h3 style="margin:0;font-size:32px;line-height:1.05;">{{ sel.name }}</h3>
-            <sc-if value="{{ sel.isDone }}"><div style="font-family:var(--font-heading);font-weight:800;font-size:44px;line-height:0.9;color:var(--color-accent);white-space:nowrap;">{{ sel.rating }}<span style="font-size:16px;color:var(--color-neutral-600);">/10</span></div></sc-if>
-          </div>
-          <div style="font-size:14px;color:var(--color-neutral-700);">{{ sel.address }}</div>
-          <sc-if value="{{ sel.hasG }}"><div style="display:flex;gap:var(--space-2);align-items:baseline;font-size:14px;"><span style="font-family:var(--font-heading);font-weight:800;font-size:20px;">{{ sel.g }}</span><span style="color:var(--color-neutral-700);">Google puanı · {{ sel.gCount }} yorum</span></div></sc-if>
-          <sc-if value="{{ sel.hasNote }}">
-            <div style="padding:var(--space-4) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-size:16px;line-height:1.55;text-wrap:pretty;">{{ sel.note }}</div>
-          </sc-if>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-top:var(--space-2);">
-            <a class="btn btn-primary" href="{{ sel.dirUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:12px 14px;">Yol tarifi al <span>→</span></a>
-            <a class="btn btn-secondary" href="{{ sel.mapUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:12px 14px;">Google Maps <span>↗</span></a>
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <div class="gr-card" id="gr-card">
+          <sc-if value="{{ sel.hasPhoto }}"><div class="gr-cardimg" style="height:140px;position:relative;overflow:hidden;border-bottom:2px solid var(--color-text);"><img src="{{ sel.photo }}" alt="{{ sel.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{{ photoFilter }};"></div></sc-if>
+          <div style="padding:var(--space-4) var(--space-4) var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);">
+              <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">{{ sel.statusLabel }} · {{ sel.cat }}</div>
+              <button class="btn btn-icon" onClick="{{ closeSel }}" title="Kapat" style="font-size:20px;width:28px;height:28px;">×</button>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;">
+              <h3 style="margin:0;font-size:26px;line-height:1.05;">{{ sel.name }}</h3>
+              <sc-if value="{{ sel.isDone }}"><div style="font-family:var(--font-heading);font-weight:800;font-size:36px;line-height:0.9;color:var(--color-accent);white-space:nowrap;">{{ sel.rating }}<span style="font-size:14px;color:var(--color-neutral-600);">/10</span></div></sc-if>
+            </div>
+            <div style="font-size:13px;color:var(--color-neutral-700);">{{ sel.address }}</div>
+            <div style="display:flex;gap:var(--space-3);align-items:baseline;font-size:13px;flex-wrap:wrap;">
+              <sc-if value="{{ sel.hasG }}"><span><strong style="font-family:var(--font-heading);font-size:17px;">{{ sel.g }}</strong> <span style="color:var(--color-neutral-700);">Google · {{ sel.gCount }} yorum</span></span></sc-if>
+              <sc-if value="{{ sel.hasDist }}"><span style="color:var(--color-accent-700);font-weight:700;">{{ sel.dist }} uzakta</span></sc-if>
+            </div>
+            <sc-if value="{{ sel.hasNote }}">
+              <div style="padding:var(--space-3) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-size:15px;line-height:1.5;text-wrap:pretty;">{{ sel.note }}</div>
+            </sc-if>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-top:var(--space-1);">
+              <a class="btn btn-primary" href="{{ sel.dirUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:10px 12px;">Yol tarifi <span>→</span></a>
+              <a class="btn btn-secondary" href="{{ sel.mapUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:10px 12px;">Google Maps <span>↗</span></a>
+            </div>
+            <sc-if value="{{ admin }}">
+              <div style="display:flex;gap:var(--space-1);">
+                <sc-if value="{{ sel.isTodo }}"><button class="btn btn-ghost" onClick="{{ selWent }}" style="font-size:13px;">Gittim, puanla →</button></sc-if>
+                <button class="btn btn-ghost" onClick="{{ selEdit }}" style="font-size:13px;color:var(--color-text);">Düzenle</button>
+              </div>
+            </sc-if>
           </div>
         </div>
       </sc-if>
     </aside>
   </main>
 
-  <footer style="border-top:2px solid var(--color-divider);">
-    <div style="max-width:1320px;margin:0 auto;padding:var(--space-6);display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
-      <div style="font-size:12px;color:var(--color-neutral-700);">© Gurmeranya · Afiyet olsun. <span style="opacity:0.7;">{{ modeLabel }}</span></div>
-      <div style="display:flex;align-items:center;gap:var(--space-3);position:relative;">
-        <sc-if value="{{ admin }}"><button class="btn btn-ghost" onClick="{{ logout }}" style="font-size:12px;">Mutfaktan çık</button></sc-if>
-        <sc-if value="{{ lockOpen }}">
-          <div style="position:absolute;bottom:44px;right:0;width:260px;padding:var(--space-4);background:var(--color-surface);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:var(--space-2);">
-            <div style="font-family:var(--font-heading);font-weight:800;font-size:17px;">Mutfağa giriş</div>
-            <input class="input" type="password" value="{{ pw }}" onInput="{{ setPw }}" onKeyDown="{{ pwKey }}" placeholder="Şifre">
-            <sc-if value="{{ pwErr }}"><div style="font-size:12px;color:var(--color-accent-700);">Yanlış. Şef seni tanımadı.</div></sc-if>
-            <button class="btn btn-primary btn-block" onClick="{{ tryLogin }}">Gir →</button>
-          </div>
-        </sc-if>
-        <button class="btn btn-icon" onClick="{{ toggleLock }}" title="Mutfak" style="width:28px;height:28px;color:var(--color-neutral-500);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        </button>
-      </div>
-    </div>
-  </footer>
+  <button class="gr-fab" onClick="{{ toggleView }}">{{ fabLabel }}</button>
 
   <sc-if value="{{ placeModal }}" hint-placeholder-val="{{ false }}">
     <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:20;overflow-y:auto;align-items:start;">
@@ -297,9 +355,13 @@ input[type=range]{accent-color:var(--color-accent)}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;photoGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
 class Component extends DCLogic {
-  state = { places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sel: null, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
+  state = { places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sort: 'smart', sel: null, view: 'list', me: null, locating: false, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
 
   async componentDidMount() {
+    this.onKey = e => { if (e.key === 'Escape') this.setState(s => s.modal ? { modal: null } : { sel: null }); };
+    window.addEventListener('keydown', this.onKey);
+    this.watchBar();
+    this.initMap();
     try {
       const base = location.href;
       const [{ CONFIG }, db] = await Promise.all([import(new URL('./config.js', base).href), import(new URL('./db.js', base).href)]);
@@ -310,6 +372,132 @@ class Component extends DCLogic {
       this.store.onAuth(a => this.setState({ admin: a }));
     } catch (e) { console.error('Gurmeranya init', e); }
   }
+
+  componentDidUpdate() { this.syncMap(); }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onKey);
+    if (this.ro) this.ro.disconnect();
+    if (this.map) this.map.remove();
+  }
+
+  // Yapışkan filtre çubuğunun yüksekliği → mobil harita yüksekliği
+  watchBar() {
+    const bar = document.getElementById('gr-bar'); if (!bar || !window.ResizeObserver) return;
+    this.ro = new ResizeObserver(() => { document.documentElement.style.setProperty('--gr-barh', bar.offsetHeight + 'px'); if (this.map) this.map.invalidateSize(); });
+    this.ro.observe(bar);
+  }
+
+  isMobile() { return window.matchMedia('(max-width: 899px)').matches; }
+
+  // ——— Harita (Leaflet + OpenStreetMap, anahtar gerekmez) ———
+  loadAsset(tag, attrs) {
+    return new Promise((ok, no) => { const el = document.createElement(tag); Object.assign(el, attrs); el.onload = ok; el.onerror = no; document.head.appendChild(el); });
+  }
+
+  async initMap() {
+    const cdn = 'https://cdnjs.cloudflare.com/ajax/libs/';
+    try {
+      if (!window.L) {
+        this.loadAsset('link', { rel: 'stylesheet', href: cdn + 'leaflet/1.9.4/leaflet.min.css' });
+        this.loadAsset('link', { rel: 'stylesheet', href: cdn + 'leaflet.markercluster/1.5.3/MarkerCluster.min.css' });
+        await this.loadAsset('script', { src: cdn + 'leaflet/1.9.4/leaflet.min.js' });
+      }
+      if (!window.L.markerClusterGroup) await this.loadAsset('script', { src: cdn + 'leaflet.markercluster/1.5.3/leaflet.markercluster.min.js' });
+    } catch (e) { console.error('Harita yüklenemedi', e); return; }
+    this.libsReady = true;
+    this.syncMap();
+  }
+
+  // Harita ancak görünürken kurulur (mobilde gizliyken 0 boyutla kurulursa kayar)
+  createMap() {
+    const L = window.L, el = document.getElementById('gr-map'); if (!el || !el.clientWidth) return;
+    const map = this.map = L.map(el, { zoomControl: false, zoomSnap: 0.5 }).setView([39.2, 34.5], 6);
+    L.control.zoom({ position: 'topright' }).addTo(map);
+    if (this.props.mapGray !== false) el.classList.add('gray');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+    this.cluster = L.markerClusterGroup({
+      showCoverageOnHover: false, maxClusterRadius: 42, disableClusteringAtZoom: 15, spiderfyOnMaxZoom: true,
+      iconCreateFunction: c => { const n = c.getChildCount(), big = n >= 10, s = big ? 46 : 38; return L.divIcon({ html: '<div class="gr-cl' + (big ? ' big' : '') + '">' + n + '</div>', className: '', iconSize: [s, s], iconAnchor: [s / 2, s / 2] }); }
+    });
+    map.addLayer(this.cluster);
+    this.markers = {};
+  }
+
+  pinIcon(p, on) {
+    const d = p.status === 'done', s = d ? 28 : 14;
+    return window.L.divIcon({ className: '', html: '<div class="gr-pin' + (d ? ' d' : '') + (on ? ' on' : '') + '">' + (d ? (p.rating || '') : '') + '</div>', iconSize: [s, s], iconAnchor: [s / 2, s / 2], tooltipAnchor: [0, -s / 2 - 2] });
+  }
+
+  syncMap() {
+    if (!this.map && this.libsReady) this.createMap();
+    if (!this.map) return;
+    const L = window.L, list = this.list || [], sel = this.selId;
+    const sig = list.map(p => p.id + p.lat + p.lng + p.status + p.rating).join('|');
+    if (sig !== this.sig) {
+      const first = this.sig == null;
+      this.sig = sig; this.cluster.clearLayers(); this.markers = {}; this.lastSel = undefined;
+      this.cluster.addLayers(list.filter(p => p.lat != null).map(p => {
+        const m = L.marker([p.lat, p.lng], { icon: this.pinIcon(p, p.id === sel), riseOnHover: true, keyboard: false });
+        m.bindTooltip(p.name, { direction: 'top' });
+        m.on('click', () => this.select(p.id, true));
+        this.markers[p.id] = m; return m;
+      }));
+      if (!sel) this.fitAll(!first);
+    }
+    if (sel !== this.lastSel) {
+      const prev = this.markers[this.lastSel], m = this.markers[sel];
+      if (prev && this.pmap[this.lastSel]) { prev.setIcon(this.pinIcon(this.pmap[this.lastSel], false)); prev.setZIndexOffset(0); }
+      if (m) { m.setIcon(this.pinIcon(this.pmap[sel], true)); m.setZIndexOffset(1000); this.focus(m.getLatLng()); }
+      this.lastSel = sel;
+    }
+    if (this.me && !this.meMarker) this.meMarker = L.marker([this.me.lat, this.me.lng], { icon: L.divIcon({ className: '', html: '<div class="gr-me"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false, zIndexOffset: 2000 }).addTo(this.map);
+  }
+
+  // Seçili mekânı kartın üstünde kalacak şekilde ortala
+  focus(ll) {
+    if (!this.map.getSize().x) return;
+    const map = this.map, z = Math.max(map.getZoom(), 15);
+    const card = document.getElementById('gr-card');
+    const shift = card ? Math.min(card.offsetHeight, map.getSize().y * 0.6) / 2 : 0;
+    const target = map.unproject(map.project(ll, z).add([0, shift]), z);
+    map.flyTo(target, z, { duration: map.getZoom() < 12 ? 1.1 : 0.6 });
+  }
+
+  fitAll(animate) {
+    if (!this.map) return;
+    const pts = (this.list || []).filter(p => p.lat != null).map(p => [p.lat, p.lng]);
+    if (this.me && this.state.sort === 'near') pts.push([this.me.lat, this.me.lng]);
+    if (!pts.length) return;
+    if (pts.length === 1) this.map.setView(pts[0], 15, { animate });
+    else this.map.fitBounds(pts, { padding: [48, 48], maxZoom: 15, animate });
+  }
+
+  select(id, fromMap) {
+    this.setState({ sel: id }, () => {
+      if (fromMap && !this.isMobile()) { const row = document.getElementById('row-' + id); if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    });
+  }
+
+  locate(thenSort) {
+    if (!navigator.geolocation) { alert('Tarayıcın konum vermiyor.'); return; }
+    this.setState({ locating: true });
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.me = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (this.meMarker) { this.meMarker.remove(); this.meMarker = null; }
+      this.setState(Object.assign({ me: this.me, locating: false }, thenSort ? { sort: 'near' } : {}), () => {
+        if (this.map) this.map.flyTo([this.me.lat, this.me.lng], 14, { duration: 1 });
+      });
+    }, () => { this.setState({ locating: false, sort: this.state.sort === 'near' ? 'smart' : this.state.sort }); alert('Konumuna ulaşamadım. Tarayıcıdan izin vermen gerekebilir.'); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  }
+
+  km(p) {
+    const me = this.state.me; if (!me || p.lat == null) return null;
+    const r = Math.PI / 180, a = Math.sin((p.lat - me.lat) * r / 2) ** 2 + Math.cos(me.lat * r) * Math.cos(p.lat * r) * Math.sin((p.lng - me.lng) * r / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(a));
+  }
+
+  fmtKm(d) { return d == null ? '' : d < 1 ? Math.round(d * 1000 / 10) * 10 + ' m' : (d < 10 ? d.toFixed(1).replace('.', ',') : Math.round(d)) + ' km'; }
 
   label(r) {
     r = +r;
@@ -327,7 +515,6 @@ class Component extends DCLogic {
     const pid = p.placeId ? '&destination_place_id=' + p.placeId : '';
     const qpid = p.placeId ? '&query_place_id=' + p.placeId : '';
     return {
-      embed: 'https://maps.google.com/maps?q=' + (p.lat != null ? p.lat + ',' + p.lng : q) + '&z=16&output=embed',
       dirUrl: 'https://www.google.com/maps/dir/?api=1&destination=' + q + pid,
       mapUrl: p.mapUrl || ('https://www.google.com/maps/search/?api=1&query=' + q + qpid)
     };
@@ -382,51 +569,83 @@ class Component extends DCLogic {
     const cityOpts = [...new Set(s.places.map(p => p.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
     const districtOpts = [...new Set(s.places.filter(p => !s.city || p.city === s.city).map(p => p.district).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
     const q = s.q.trim().toLocaleLowerCase('tr');
-    let list = s.places.filter(p =>
-      (s.tab === 'all' || (s.tab === 'done' ? p.status === 'done' : p.status !== 'done')) &&
-      (!s.city || p.city === s.city) && (!s.district || p.district === s.district) && (!s.cat || p.cat === s.cat) &&
-      (!q || (p.name + ' ' + (p.note || '')).toLocaleLowerCase('tr').includes(q)));
-    list = list.slice().sort((a, b) => (a.status === 'done') - (b.status === 'done') || (+b.rating || 0) - (+a.rating || 0) || (b.createdAt || 0) - (a.createdAt || 0));
-    const selId = s.sel && list.some(p => p.id === s.sel) ? s.sel : (list[0] && list[0].id);
-    const selP = list.find(p => p.id === selId);
+    const inTab = p => s.tab === 'all' || (s.tab === 'done' ? p.status === 'done' : p.status !== 'done');
+    const inPlace = p => (!s.city || p.city === s.city) && (!s.district || p.district === s.district);
+    let list = s.places.filter(p => inTab(p) && inPlace(p) && (!s.cat || p.cat === s.cat) &&
+      (!q || [p.name, p.note, p.district, p.city, p.cat].join(' ').toLocaleLowerCase('tr').includes(q)));
+    const dist = {}; list.forEach(p => dist[p.id] = this.km(p));
+    const byNew = (a, b) => (b.createdAt || 0) - (a.createdAt || 0);
+    const sorts = {
+      smart: (a, b) => (a.status === 'done') - (b.status === 'done') || (+b.rating || 0) - (+a.rating || 0) || byNew(a, b),
+      near: (a, b) => (dist[a.id] == null ? 1e9 : dist[a.id]) - (dist[b.id] == null ? 1e9 : dist[b.id]),
+      rating: (a, b) => (+b.rating || 0) - (+a.rating || 0) || (+b.googleRating || 0) - (+a.googleRating || 0),
+      google: (a, b) => (+b.googleRating || 0) - (+a.googleRating || 0) || (+b.googleCount || 0) - (+a.googleCount || 0),
+      new: byNew,
+      az: (a, b) => a.name.localeCompare(b.name, 'tr')
+    };
+    list = list.slice().sort(sorts[s.sort] || sorts.smart);
+    const selP = s.sel ? list.find(p => p.id === s.sel) : null;
+    this.list = list; this.selId = selP ? selP.id : null;
+    this.pmap = {}; s.places.forEach(p => this.pmap[p.id] = p);
     const tabDefs = [
       { k: 'all', label: 'Hepsi', count: s.places.length, title: 'Bütün defter', sub: 'Gidilen, gidilecek, hayal edilen.' },
       { k: 'todo', label: 'Bekleme Salonu', count: todo.length, title: 'Bekleme Salonu', sub: 'Adını duyduk, mide randevu bekliyor.' },
       { k: 'done', label: 'Tabak Sıyırdıklarım', count: done.length, title: 'Tabak Sıyırdıklarım', sub: 'Gittik, yedik, hüküm verdik.' }
     ];
     const tab = tabDefs.find(t => t.k === s.tab);
+    const catBase = s.places.filter(p => inTab(p) && inPlace(p));
     const f = {};
     ['name', 'city', 'district', 'cat', 'note', 'mapUrl', 'rating'].forEach(k => f[k] = e => { const v = e.target.value; this.setState(st => ({ form: Object.assign({}, st.form, { [k]: k === 'rating' ? +v : v }) })); });
     const fd = s.form.status === 'done';
     const sel = selP ? Object.assign({
       name: selP.name, cat: selP.cat, note: selP.note, hasNote: !!selP.note,
       address: selP.address || [selP.district, selP.city].filter(Boolean).join(', '),
-      isDone: selP.status === 'done', rating: selP.rating,
+      isDone: selP.status === 'done', isTodo: selP.status !== 'done', rating: selP.rating,
+      photo: selP.photoUrl, hasPhoto: !!selP.photoUrl && P.showPhotos !== false,
       hasG: !!selP.googleRating, g: selP.googleRating, gCount: (selP.googleCount || 0).toLocaleString('tr-TR'),
+      hasDist: dist[selP.id] != null, dist: this.fmtKm(dist[selP.id]),
       statusLabel: selP.status === 'done' ? 'Tabak sıyrıldı' : 'Bekleme salonunda'
     }, this.urls(selP)) : {};
     const login = async () => { const ok = await this.store.login(s.pw); this.setState(ok ? { lockOpen: false, pw: '', pwErr: false } : { pwErr: true }); };
+    const setView = v => this.setState({ view: v }, () => { const bar = document.getElementById('gr-bar'); if (v !== 'map') { const row = this.selId && document.getElementById('row-' + this.selId); if (row) row.scrollIntoView({ block: 'center' }); return; } if (bar) window.scrollTo(0, bar.offsetTop); if (!this.map) { this.syncMap(); return; } this.map.invalidateSize(); if (this.selId) { this.lastSel = undefined; this.syncMap(); } else this.fitAll(false); });
     return {
       admin: s.admin, doneCount: done.length, todoCount: todo.length, cityCount: cityOpts.length, avg,
+      rootCls: s.view === 'map' ? 'mob-map' : '',
       tabs: tabDefs.map(t => ({ label: t.label, count: t.count, bg: s.tab === t.k ? accent : 'transparent', color: s.tab === t.k ? bg : ink, onClick: () => this.setState({ tab: t.k }) })),
-      tabTitle: tab.title, tabSub: tab.sub,
+      tabTitle: tab.title, tabSub: tab.sub, listCount: list.length,
       city: s.city, district: s.district, q: s.q, cityOpts, districtOpts,
       setCity: e => this.setState({ city: e.target.value, district: '' }),
       setDistrict: e => this.setState({ district: e.target.value }),
       setQ: e => this.setState({ q: e.target.value }),
-      chips: [''].concat(s.cats).map(c => { const on = s.cat === c; return { label: c || 'Tümü', bg: on ? ink : 'transparent', color: on ? bg : ink, border: on ? ink : 'var(--color-divider)', onClick: () => this.setState({ cat: c }) }; }),
+      sort: s.sort,
+      sortOpts: [{ k: 'smart', label: 'Sıra: Önerilen' }, { k: 'near', label: 'Sıra: Yakınımda' }, { k: 'rating', label: 'Sıra: Benim puanım' }, { k: 'google', label: 'Sıra: Google puanı' }, { k: 'new', label: 'Sıra: Son eklenen' }, { k: 'az', label: 'Sıra: A → Z' }],
+      setSort: e => { const v = e.target.value; if (v === 'near' && !s.me) this.locate(true); else this.setState({ sort: v }); },
+      hasFilters: !!(s.city || s.district || s.cat || s.q || s.tab !== 'all'),
+      clearFilters: () => this.setState({ city: '', district: '', cat: '', q: '', tab: 'all' }),
+      chips: [''].concat(s.cats).map(c => { const on = s.cat === c, n = c ? catBase.filter(p => p.cat === c).length : catBase.length; return { label: c || 'Tümü', count: n || '', bg: on ? ink : 'transparent', color: on ? bg : ink, border: on ? ink : 'var(--color-divider)', onClick: () => this.setState({ cat: c }) }; }),
       empty: list.length === 0,
-      rows: list.map((p, i) => ({
-        n: String(i + 1).padStart(2, '0'), name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat,
+      rows: list.map(p => ({
+        domId: 'row-' + p.id, cls: 'gr-row' + (p.id === this.selId ? ' on' : ''),
+        name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat,
         note: p.note, hasNote: !!p.note, photo: p.photoUrl, hasPhoto: !!p.photoUrl && P.showPhotos !== false,
-        hasG: !!p.googleRating, g: p.googleRating,
+        hasG: !!p.googleRating, g: p.googleRating, hasDist: dist[p.id] != null, dist: this.fmtKm(dist[p.id]),
         isDone: p.status === 'done', isTodo: p.status !== 'done', rating: p.rating, ratingLabel: this.label(p.rating),
-        bg: p.id === selId ? 'var(--color-surface)' : 'transparent', numColor: p.id === selId ? accent : 'var(--color-neutral-600)',
-        onClick: () => this.setState({ sel: p.id }),
-        onEdit: e => { e.stopPropagation(); this.openForm(p); },
-        onWent: e => { e.stopPropagation(); this.openForm(Object.assign({}, p, { status: 'done', rating: p.rating || 8 })); }
+        onClick: () => { this.select(p.id); if (this.isMobile()) setView('map'); }
       })),
-      photoFilter: P.photoGray ? 'grayscale(1) contrast(1.08)' : 'none', hasSel: !!selP, sel, mapFilter: P.mapGray === false ? 'none' : 'grayscale(1) contrast(1.05)',
+      pickRandom: () => {
+        const pool = list.filter(p => p.status !== 'done').length ? list.filter(p => p.status !== 'done') : list;
+        if (!pool.length) return;
+        const p = pool[Math.floor(Math.random() * pool.length)];
+        this.select(p.id, true); if (this.isMobile()) setView('map');
+      },
+      photoFilter: P.photoGray ? 'grayscale(1) contrast(1.08)' : 'none', hasSel: !!selP, sel,
+      closeSel: () => this.setState({ sel: null }),
+      selEdit: () => this.openForm(selP),
+      selWent: () => this.openForm(Object.assign({}, selP, { status: 'done', rating: selP.rating || 8 })),
+      fitAll: () => this.setState({ sel: null }, () => this.fitAll(true)),
+      locateMe: () => this.locate(false), locLabel: s.locating ? 'Aranıyor…' : 'Konumum ◎',
+      fabLabel: s.view === 'map' ? '☰  Liste' : '◱  Harita',
+      toggleView: () => setView(s.view === 'map' ? 'list' : 'map'),
       modeLabel: s.mode === 'firebase' ? '· Firebase bağlı' : '· Yerel mod',
       lockOpen: s.lockOpen, pw: s.pw, pwErr: s.pwErr,
       toggleLock: () => this.setState({ lockOpen: !s.lockOpen, pwErr: false }),
