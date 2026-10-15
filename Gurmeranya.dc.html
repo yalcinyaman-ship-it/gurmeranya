@@ -106,6 +106,7 @@ input[type=range]{accent-color:var(--color-accent)}
       <sc-if value="{{ admin }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:var(--space-2);">
           <button class="btn btn-secondary" onClick="{{ openSettings }}">Ayarlar</button>
+          <sc-if value="{{ dupCount }}"><button class="btn btn-secondary" onClick="{{ openDups }}" style="border-color:var(--color-accent);color:var(--color-accent-700);">⚠ {{ dupCount }} tekrar</button></sc-if>
           <button class="btn btn-secondary" onClick="{{ openCats }}">Kategoriler</button>
           <button class="btn btn-primary" onClick="{{ openAdd }}">＋ Yeni mekân</button>
         </div>
@@ -234,12 +235,13 @@ input[type=range]{accent-color:var(--color-accent)}
               <a class="btn btn-primary" href="{{ sel.dirUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:10px 12px;">Yol tarifi <span>→</span></a>
               <a class="btn btn-secondary" href="{{ sel.mapUrl }}" target="_blank" rel="noopener" style="justify-content:space-between;padding:10px 12px;">Google Maps <span>↗</span></a>
             </div>
-            <sc-if value="{{ admin }}">
-              <div style="display:flex;gap:var(--space-1);">
+            <div style="display:flex;gap:var(--space-1);flex-wrap:wrap;">
+              <button class="btn btn-ghost" onClick="{{ shareSel }}" style="font-size:13px;color:var(--color-text);">{{ shareLabel }}</button>
+              <sc-if value="{{ admin }}">
                 <sc-if value="{{ sel.isTodo }}"><button class="btn btn-ghost" onClick="{{ selWent }}" style="font-size:13px;">Gittim, puanla →</button></sc-if>
                 <button class="btn btn-ghost" onClick="{{ selEdit }}" style="font-size:13px;color:var(--color-text);">Düzenle</button>
-              </div>
-            </sc-if>
+              </sc-if>
+            </div>
           </div>
         </div>
       </sc-if>
@@ -277,6 +279,16 @@ input[type=range]{accent-color:var(--color-accent)}
               </div>
             </sc-if>
           </div>
+          <sc-if value="{{ dup }}">
+            <div id="gr-dupwarn" style="padding:var(--space-3) var(--space-4);border:2px solid var(--color-accent);background:var(--color-accent-100);display:flex;flex-direction:column;gap:var(--space-2);">
+              <div style="font-family:var(--font-heading);font-weight:800;font-size:16px;">⚠ Bu mekân zaten defterde</div>
+              <div style="font-size:13px;line-height:1.45;"><strong>{{ dup.name }}</strong> · {{ dup.loc }} · {{ dup.where }}<span style="color:var(--color-neutral-700);">{{ dup.why }}</span></div>
+              <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+                <button class="btn btn-primary" onClick="{{ dupEdit }}" style="font-size:13px;">Onu düzenle →</button>
+                <button class="btn btn-secondary" onClick="{{ dupAnyway }}" style="font-size:13px;background:var(--color-bg);">{{ dupAnywayLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
           <div class="field"><label>Mekân adı</label><input class="input" value="{{ form.name }}" onInput="{{ f.name }}"></div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-3);">
             <div class="field"><label>Şehir</label><input class="input" value="{{ form.city }}" onInput="{{ f.city }}"></div>
@@ -347,6 +359,31 @@ input[type=range]{accent-color:var(--color-accent)}
     </div>
   </sc-if>
 
+  <sc-if value="{{ dupModal }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:3000;overflow-y:auto;align-items:start;">
+      <div onClick="{{ stop }}" style="width:min(600px,100%);margin:var(--space-8) auto;background:var(--color-bg);box-shadow:var(--shadow-lg);">
+        <div style="padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:22px;">İki kez eklenenler</div>
+          <button class="btn btn-icon" onClick="{{ closeModal }}" style="font-size:20px;">×</button>
+        </div>
+        <div style="padding:var(--space-4) var(--space-6) var(--space-6);display:flex;flex-direction:column;">
+          <div style="font-size:13px;color:var(--color-neutral-700);padding-bottom:var(--space-3);">Aynı mekânın kayıtları yan yana. Notu, puanı olanı tut; fazlasını sil.</div>
+          <sc-if value="{{ dupEmpty }}"><div style="font-family:var(--font-heading);font-weight:800;font-size:20px;padding:var(--space-4) 0;">Tertemiz. Tekrar yok ✓</div></sc-if>
+          <sc-for list="{{ dupRows }}" as="d">
+            <sc-if value="{{ d.first }}"><div style="font-family:var(--font-heading);font-weight:800;font-size:17px;padding:var(--space-4) 0 var(--space-2);border-top:2px solid var(--color-divider);">{{ d.emo }} {{ d.name }}</div></sc-if>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);padding:var(--space-2) 0 var(--space-2) var(--space-3);border-left:3px solid var(--color-divider);margin-bottom:var(--space-2);">
+              <div style="min-width:0;font-size:13px;line-height:1.45;">
+                <div><strong>{{ d.where }}</strong> · {{ d.loc }} · eklendi {{ d.date }}</div>
+                <div style="color:var(--color-neutral-700);">{{ d.detail }}</div>
+              </div>
+              <button class="btn btn-secondary" onClick="{{ d.onDel }}" style="font-size:12px;flex:none;">Bunu sil</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ catModal }}" hint-placeholder-val="{{ false }}">
     <div class="dialog-backdrop" onClick="{{ closeModal }}" style="z-index:3000;">
       <div onClick="{{ stop }}" style="width:min(460px,100%);background:var(--color-bg);box-shadow:var(--shadow-lg);">
@@ -375,9 +412,10 @@ input[type=range]{accent-color:var(--color-accent)}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;photoGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;mapGray&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;showPhotos&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
 class Component extends DCLogic {
-  state = { rolling: false, rollName: '', tagline: ['Döner mi, tatlı mı? Neden ikisi değil.', 'Mide gurulduyorsa doğru yerdesin.', 'Diyet pazartesi başlar. Hangi pazartesi, belli değil.', 'Bir tabak daha sıyıralım.', 'Açken karar verilmez ama deneriz.', 'Kokusu sokağın başından gelir.'][Math.floor(Math.random() * 6)], places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sort: 'smart', sel: null, view: 'list', me: null, locating: false, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
+  state = { dupOk: false, copied: false, rolling: false, rollName: '', tagline: ['Döner mi, tatlı mı? Neden ikisi değil.', 'Mide gurulduyorsa doğru yerdesin.', 'Diyet pazartesi başlar. Hangi pazartesi, belli değil.', 'Bir tabak daha sıyıralım.', 'Açken karar verilmez ama deneriz.', 'Kokusu sokağın başından gelir.'][Math.floor(Math.random() * 6)], places: [], cats: [], settings: {}, keyDraft: '', keyShow: false, testMsg: '', testOk: null, testing: false, mode: 'local', tab: 'all', city: '', district: '', cat: '', q: '', sort: 'smart', sel: null, view: 'list', me: null, locating: false, admin: false, lockOpen: false, pw: '', pwErr: false, modal: null, form: {}, newCat: '', sq: '', sres: [], searching: false, searchNote: '' };
 
   async componentDidMount() {
+    const hm = location.hash.match(/m=([^&]+)/); let want = hm ? decodeURIComponent(hm[1]) : null;
     this.onKey = e => { if (e.key === 'Escape') this.setState(s => s.modal ? { modal: null } : { sel: null }); };
     window.addEventListener('keydown', this.onKey);
     this.watchBar();
@@ -388,7 +426,11 @@ class Component extends DCLogic {
       this.cfg = CONFIG; this.db = db;
       this.store = await db.createStore(CONFIG);
       this.setState({ mode: this.store.mode });
-      this.store.subscribe(({ places, cats, settings }) => this.setState(s => ({ places, cats, settings: settings || {}, sel: s.sel && places.some(p => p.id === s.sel) ? s.sel : null })));
+      this.store.subscribe(({ places, cats, settings }) => this.setState(s => {
+        let sel = s.sel && places.some(p => p.id === s.sel) ? s.sel : null;
+        if (want && places.some(p => p.id === want)) { sel = want; want = null; this.scrollToSel = true; }
+        return { places, cats, settings: settings || {}, sel };
+      }));
       this.store.onAuth(a => this.setState({ admin: a }));
     } catch (e) { console.error('Gurmeranya init', e); }
   }
@@ -469,7 +511,9 @@ class Component extends DCLogic {
       const prev = this.markers[this.lastSel], m = this.markers[sel];
       if (prev && this.pmap[this.lastSel]) { prev.setIcon(this.pinIcon(this.pmap[this.lastSel], false)); prev.setZIndexOffset(0); }
       if (m) { m.setIcon(this.pinIcon(this.pmap[sel], true)); m.setZIndexOffset(1000); this.focus(m.getLatLng()); }
+      if (sel || this.lastSel) try { history.replaceState(null, '', sel ? '#m=' + encodeURIComponent(sel) : location.pathname + location.search); } catch (e) {}
       this.lastSel = sel;
+      if (this.scrollToSel && sel) { this.scrollToSel = false; const row = document.getElementById('row-' + sel); if (row && !this.isMobile()) row.scrollIntoView({ block: 'center' }); }
     }
     if (this.me && !this.meMarker) this.meMarker = L.marker([this.me.lat, this.me.lng], { icon: L.divIcon({ className: '', html: '<div class="gr-me"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false, zIndexOffset: 2000 }).addTo(this.map);
   }
@@ -519,6 +563,32 @@ class Component extends DCLogic {
 
   fmtKm(d) { return d == null ? '' : d < 1 ? Math.round(d * 1000 / 10) * 10 + ' m' : (d < 10 ? d.toFixed(1).replace('.', ',') : Math.round(d)) + ' km'; }
 
+  norm(t) { return (t || '').toLocaleLowerCase('tr').replace(/[^a-z0-9çğıöşü]/g, ''); }
+
+  // Aynı Google kimliği ya da aynı ad + ilçe → aynı mekân
+  dupKey(p) { return p.placeId ? 'g:' + p.placeId : 'n:' + this.norm(p.name) + '|' + this.norm(p.district); }
+
+  findDup(fm) {
+    const n = this.norm(fm.name); if (!n && !fm.placeId) return null;
+    return this.state.places.find(p => p.id !== fm.id && ((fm.placeId && p.placeId === fm.placeId) || (n && this.norm(p.name) === n && this.norm(p.district) === this.norm(fm.district)))) || null;
+  }
+
+  dupGroups() {
+    const g = {};
+    this.state.places.forEach(p => { const k = this.dupKey(p); (g[k] = g[k] || []).push(p); });
+    // placeId'si olan ile olmayan aynı ad+ilçe kaydını da yakala
+    const byName = {};
+    this.state.places.forEach(p => { const k = 'n:' + this.norm(p.name) + '|' + this.norm(p.district); (byName[k] = byName[k] || []).push(p); });
+    const seen = new Set(), out = [];
+    Object.values(g).concat(Object.values(byName)).forEach(list => {
+      if (list.length < 2) return;
+      const ids = list.map(p => p.id).sort().join(','); if (seen.has(ids)) return;
+      if (list.every(p => out.some(o => o.includes(p)))) return;
+      seen.add(ids); out.push(list);
+    });
+    return out;
+  }
+
   emo(c) {
     const m = { 'kahvalt': '🍳', 'tavuk': '🍗', 'döner': '🥙', 'kebap': '🍢', 'esnaf': '🍲', 'tatlı': '🍰', 'baklava': '🍯', 'balık': '🐟', 'pide': '🫓', 'lahmacun': '🫓', 'kahve': '☕', 'sokak': '🌯', 'kavurma': '🥩', 'köfte': '🍖', 'mantı': '🥟', 'pizza': '🍕', 'burger': '🍔', 'çorba': '🥣', 'dondurma': '🍦' };
     const k = (c || '').toLocaleLowerCase('tr'); if (!k) return '🍽️';
@@ -549,7 +619,7 @@ class Component extends DCLogic {
 
   openForm(p) {
     const base = { name: '', city: this.state.city || '', district: this.state.district || '', cat: this.state.cats[0] || '', status: 'todo', rating: 8, note: '', mapUrl: '' };
-    this.setState({ modal: 'place', form: Object.assign(base, p || {}), sq: '', sres: [], searchNote: '' });
+    this.setState({ modal: 'place', form: Object.assign(base, p || {}), sq: '', sres: [], searchNote: '', dupOk: false });
   }
 
   key() { return (this.state.settings && this.state.settings.mapsKey) || (this.cfg && this.cfg.mapsKey) || ''; }
@@ -633,6 +703,16 @@ class Component extends DCLogic {
       hasDist: dist[selP.id] != null, dist: this.fmtKm(dist[selP.id]),
       statusLabel: selP.status === 'done' ? 'Tabak sıyrıldı' : 'Bekleme salonunda'
     }, this.urls(selP)) : {};
+    const dupP = s.modal === 'place' ? this.findDup(s.form) : null;
+    const groups = s.admin ? this.dupGroups() : [];
+    const fmtDate = t => t > 1e11 ? new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+    const doSave = async force => {
+      const fm = s.form; if (!fm.name || !fm.name.trim()) return;
+      if (dupP && !force && !s.dupOk) { const w = document.getElementById('gr-dupwarn'); if (w) w.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+      const p = Object.assign({}, fm, { id: fm.id || Date.now().toString(36), name: fm.name.trim(), createdAt: fm.createdAt || Date.now() });
+      if (p.status !== 'done') delete p.rating;
+      await this.store.save(p); this.setState({ modal: null, sel: p.id });
+    };
     const login = async () => { const ok = await this.store.login(s.pw); this.setState(ok ? { lockOpen: false, pw: '', pwErr: false } : { pwErr: true }); };
     const setView = v => this.setState({ view: v }, () => { const bar = document.getElementById('gr-bar'); if (v !== 'map') { const row = this.selId && document.getElementById('row-' + this.selId); if (row) row.scrollIntoView({ block: 'center' }); return; } if (bar) window.scrollTo(0, bar.offsetTop); if (!this.map) { this.syncMap(); return; } this.map.invalidateSize(); if (this.selId) { this.lastSel = undefined; this.syncMap(); } else this.fitAll(false); });
     return {
@@ -718,11 +798,28 @@ class Component extends DCLogic {
       sq: s.sq, setSq: e => this.setState({ sq: e.target.value }), sqKey: e => { if (e.key === 'Enter') this.doSearch(); },
       doSearch: () => this.doSearch(), searchBtn: s.searching ? 'Bakılıyor…' : 'Getir →', searchNote: s.searchNote,
       sres: s.sres.map(r => ({ name: r.name, address: r.address, gText: r.googleRating ? ' · Google ' + r.googleRating : '', onPick: () => this.fill(r) })),
-      savePlace: async () => {
-        const fm = s.form; if (!fm.name || !fm.name.trim()) return;
-        const p = Object.assign({}, fm, { id: fm.id || Date.now().toString(36), name: fm.name.trim(), createdAt: fm.createdAt || Date.now() });
-        if (p.status !== 'done') delete p.rating;
-        await this.store.save(p); this.setState({ modal: null, sel: p.id });
+      savePlace: () => doSave(false),
+      dup: dupP && !s.dupOk ? {
+        name: dupP.name, loc: [dupP.district, dupP.city].filter(Boolean).join(', '),
+        where: dupP.status === 'done' ? 'Tabak Sıyırdıklarım (' + (dupP.rating || '–') + '/10)' : 'Bekleme Salonu',
+        why: s.form.placeId && dupP.placeId === s.form.placeId ? ' · Google kaydı aynı' : ' · adı ve ilçesi aynı'
+      } : null,
+      dupEdit: () => this.openForm(dupP),
+      dupAnywayLabel: s.form.id ? 'Yine de kaydet' : 'Farklı şube, yine de ekle',
+      dupAnyway: () => { this.setState({ dupOk: true }); doSave(true); },
+      dupCount: groups.length, dupModal: s.modal === 'dups', dupEmpty: groups.length === 0,
+      openDups: () => this.setState({ modal: 'dups' }),
+      dupRows: [].concat(...groups.map(list => list.slice().sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)).map((p, i) => ({
+        first: i === 0, name: p.name, emo: this.emo(p.cat), loc: [p.district, p.city].filter(Boolean).join(', '),
+        where: p.status === 'done' ? 'Sıyrıldı · ' + (p.rating || '–') + '/10' : 'Bekleme Salonu',
+        date: fmtDate(p.createdAt),
+        detail: [p.cat, p.note ? '“' + (p.note.length > 70 ? p.note.slice(0, 70) + '…' : p.note) + '”' : 'not yok', p.photoUrl ? 'fotoğraflı' : 'fotoğrafsız'].filter(Boolean).join(' · '),
+        onDel: async () => { if (confirm('“' + p.name + '” kaydının bu kopyası silinsin mi? (' + (p.status === 'done' ? 'sıyrıldı' : 'bekleme salonu') + ', eklendi ' + fmtDate(p.createdAt) + ')')) await this.store.remove(p.id); }
+      })))),
+      shareLabel: s.copied ? 'Link kopyalandı ✓' : '🔗 Linki kopyala',
+      shareSel: async () => {
+        const url = location.origin + location.pathname + '#m=' + encodeURIComponent(selP.id);
+        try { if (navigator.share && this.isMobile()) await navigator.share({ title: selP.name, text: selP.name + ' · Gurmeranya', url }); else await navigator.clipboard.writeText(url); this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1800); } catch (e) {}
       },
       delPlace: async () => { if (confirm('Bu mekân defterden silinsin mi?')) { await this.store.remove(s.form.id); this.setState({ modal: null }); } },
       newCat: s.newCat, setNewCat: e => this.setState({ newCat: e.target.value }),
