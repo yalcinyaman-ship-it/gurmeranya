@@ -1,4 +1,24 @@
 {
   "cleanUrls": true,
-  "rewrites": [{ "source": "/", "destination": "/Gurmeranya.dc.html" }]
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/Gurmeranya.dc.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "img-src 'self' data: blob: https://*.tile.openstreetmap.org;"
+        }
+      ]
+    }
+  ]
 }

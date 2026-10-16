@@ -259,7 +259,7 @@ input[type=range]{accent-color:var(--color-accent)}
         </div>
         <div style="padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
           <div style="padding:var(--space-4);background:var(--color-surface);display:flex;flex-direction:column;gap:var(--space-2);">
-            <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">Google Maps linki ya da mekân adı</div>
+            <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);">Google’dan otomatik bilgi ve fotoğraf alma geçici olarak kapalı. Mekânı elle ekleyebilirsiniz.</div>
             <div style="display:flex;gap:var(--space-2);">
               <input class="input" value="{{ sq }}" onInput="{{ setSq }}" onKeyDown="{{ sqKey }}" placeholder="maps.app.goo.gl/… linki, yerleştirme kodu ya da mekân adı" style="background:var(--color-bg);">
               <button class="btn btn-primary" onClick="{{ doSearch }}" style="min-width:96px;justify-content:space-between;">{{ searchBtn }}</button>
@@ -422,7 +422,7 @@ class Component extends DCLogic {
     this.initMap();
     try {
       const base = location.href;
-      const [{ CONFIG }, db] = await Promise.all([import(new URL('./config.js', base).href), import(new URL('./db.js', base).href)]);
+      const [{ CONFIG }, db] = await Promise.all([import(new URL('./config.js', base).href), import(new URL('./db.js?v=places-paused-20261016', base).href)]);
       this.cfg = CONFIG; this.db = db;
       this.store = await db.createStore(CONFIG);
       this.setState({ mode: this.store.mode });
@@ -619,7 +619,7 @@ class Component extends DCLogic {
 
   openForm(p) {
     const base = { name: '', city: this.state.city || '', district: this.state.district || '', cat: this.state.cats[0] || '', status: 'todo', rating: 8, note: '', mapUrl: '' };
-    this.setState({ modal: 'place', form: Object.assign(base, p || {}), sq: '', sres: [], searchNote: '', dupOk: false });
+    this.setState({ modal: 'place', form: Object.assign(base, p || {}, { photoUrl: '' }), sq: '', sres: [], searchNote: '', dupOk: false });
   }
 
   key() { return (this.state.settings && this.state.settings.mapsKey) || (this.cfg && this.cfg.mapsKey) || ''; }
@@ -632,6 +632,7 @@ class Component extends DCLogic {
   }
 
   async doSearch() {
+    if (this.state.searching || !this.state.admin) return;
     const raw = this.state.sq.trim(); if (!raw) return;
     const key = this.key();
     let p = this.db.parseMapsLink(raw);
@@ -652,6 +653,7 @@ class Component extends DCLogic {
   }
 
   async testKey() {
+    if (this.state.testing || !this.state.admin) return;
     const k = this.state.keyDraft.trim(); if (!k) return;
     this.setState({ testing: true, testMsg: '' });
     try { const r = await this.db.searchPlaces(k, 'Karaköy Güllüoğlu'); this.setState({ testing: false, testOk: true, testMsg: r.length ? 'Çalışıyor. Google cevap verdi.' : 'Bağlandı ama sonuç yok.' }); }
@@ -698,7 +700,7 @@ class Component extends DCLogic {
       name: selP.name, cat: selP.cat, emo: this.emo(selP.cat), note: selP.note, hasNote: !!selP.note,
       address: selP.address || [selP.district, selP.city].filter(Boolean).join(', '),
       isDone: selP.status === 'done', isTodo: selP.status !== 'done', rating: selP.rating,
-      photo: selP.photoUrl, hasPhoto: !!selP.photoUrl && P.showPhotos !== false,
+      photo: '', hasPhoto: false,
       hasG: !!selP.googleRating, g: selP.googleRating, gCount: (selP.googleCount || 0).toLocaleString('tr-TR'),
       hasDist: dist[selP.id] != null, dist: this.fmtKm(dist[selP.id]),
       statusLabel: selP.status === 'done' ? 'Tabak sıyrıldı' : 'Bekleme salonunda'
@@ -734,7 +736,7 @@ class Component extends DCLogic {
       rows: list.map(p => ({
         domId: 'row-' + p.id, cls: 'gr-row' + (p.id === this.selId ? ' on' : ''),
         name: p.name, loc: [p.district, p.city].filter(Boolean).join(', '), cat: p.cat, emo: this.emo(p.cat),
-        note: p.note, hasNote: !!p.note, photo: p.photoUrl, hasPhoto: !!p.photoUrl && P.showPhotos !== false,
+        note: p.note, hasNote: !!p.note, photo: '', hasPhoto: false,
         hasG: !!p.googleRating, g: p.googleRating, hasDist: dist[p.id] != null, dist: this.fmtKm(dist[p.id]),
         isDone: p.status === 'done', isTodo: p.status !== 'done', rating: p.rating, ratingLabel: this.label(p.rating),
         onClick: () => { this.select(p.id); if (this.isMobile()) setView('map'); }
@@ -785,7 +787,7 @@ class Component extends DCLogic {
       testMsg: s.testMsg, testColor: s.testOk === false ? 'var(--color-accent-700)' : 'var(--color-text)',
       siteOrigin: location.origin.indexOf('http') === 0 ? location.origin : 'https://KULLANICIADIN.github.io',
       keyWhere: s.mode === 'firebase' ? 'Firebase\'de saklanır, her cihazda geçerli' : 'şimdilik bu tarayıcıda saklanır (Firebase bağlanınca her cihazda geçerli olur)',
-      formHasG: !!s.form.googleRating, formHasPhoto: !!s.form.photoUrl, formGCount: (s.form.googleCount || 0).toLocaleString('tr-TR'),
+      formHasG: !!s.form.googleRating, formHasPhoto: false, formGCount: (s.form.googleCount || 0).toLocaleString('tr-TR'),
       refreshG: async () => { try { const r = await this.db.getPlace(this.key(), s.form.placeId); this.fill(Object.assign(r, { name: s.form.name })); } catch (e) { this.setState({ searchNote: 'Yenilenemedi: ' + e.message }); } },
       form: s.form, f, cats: s.cats,
       formTitle: s.form.id ? 'Mekânı düzenle' : 'Yeni mekân',

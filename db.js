@@ -1,3 +1,6 @@
+// Paid Places requests are paused until billing safeguards are verified.
+const PLACES_ENABLED = false;
+
 const LS = 'gurmeranya_v1';
 const PW_HASH = 'b12b5c8ecf3ea08367f79eab329e4b814d728e0910e21ca038e6825d3b1a69ff';
 const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -99,11 +102,10 @@ export async function resolveShort(link) {
   return parseMapsLink(j.url || '');
 }
 
-const FIELDS = 'id,displayName,formattedAddress,googleMapsUri,photos,addressComponents,rating,userRatingCount,location';
+const FIELDS = 'id,displayName,formattedAddress,googleMapsUri,addressComponents,rating,userRatingCount,location';
 
 function mapPlace(p, key) {
   const comp = t => (p.addressComponents || []).find(c => (c.types || []).includes(t));
-  const ph = p.photos && p.photos[0];
   return {
     placeId: p.id,
     name: (p.displayName && p.displayName.text) || '',
@@ -111,7 +113,7 @@ function mapPlace(p, key) {
     city: (comp('administrative_area_level_1') || {}).longText || '',
     district: (comp('administrative_area_level_2') || {}).longText || '',
     mapUrl: p.googleMapsUri || '',
-    photoUrl: ph ? `https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=900&key=${key}` : '',
+    photoUrl: '',
     googleRating: p.rating || null,
     googleCount: p.userRatingCount || 0,
     lat: p.location ? p.location.latitude : null,
@@ -120,6 +122,7 @@ function mapPlace(p, key) {
 }
 
 async function gfetch(url, key, opts) {
+  if (!PLACES_ENABLED) throw new Error('Ücretli Google araması geçici olarak kapalı. Mekânı aşağıdaki alanlardan elle ekleyebilirsiniz.');
   const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ 'X-Goog-Api-Key': key }, opts.headers) }));
   const j = await r.json();
   if (j.error) throw new Error(j.error.message || j.error.status);
